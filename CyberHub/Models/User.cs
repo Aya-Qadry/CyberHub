@@ -9,16 +9,16 @@ namespace CyberHub.Models
 
         //  the value can be null, and the compiler will warn
         //  if you forget to check for null.
-        [Display(Name = "Username")]
+        [Display(Name = "Display Name")]
         [StringLength(100)]
-        public string? Username { get; set; }
+        public string? DisplayName { get; set; }
 
         [Display(Name = "Bio")]
         [StringLength(500)]
         public string? Bio { get; set; }
 
         [Display(Name = "Joined")]
-        public DateTime? CreationDate { get; set; } = DateTime.Now;
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
 
         [Display(Name = "Last seen")]
         public DateTime? LastLogin { get; set; }

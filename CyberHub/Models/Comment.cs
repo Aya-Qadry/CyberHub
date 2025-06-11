@@ -11,10 +11,10 @@ namespace CyberHub.Models
         public string Content { get; set; } = string.Empty;
 
         [Display(Name = "Post date")]
-        public DateTime PostDate { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Display(Name = "Update date")]
-        public DateTime? UpdateDate { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         [Display(Name = "Approved")]
         public bool IsApproved { get; set; } = true;
