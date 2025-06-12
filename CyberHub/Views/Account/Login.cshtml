@@ -1,22 +1,38 @@
-﻿@model CyberHub.ViewModels.LoginViewModel
+@model CyberHub.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Log in";
+}
 
-<form asp-action="Login" method="post">
-    <div>
-        <label asp-for="Email"></label>
-        <input asp-for="Email" />
-        <span asp-validation-for="Email"></span>
+<h2>@ViewData["Title"]</h2>
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <form asp-action="Login" method="post">
+                <h4>Use a local account to log in.</h4>
+                <hr />
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" autocomplete="username" aria-required="true" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control" type="password" autocomplete="current-password" aria-required="true" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3 form-check">
+                    <input asp-for="RememberMe" type="checkbox" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label">Remember me?</label>
+                </div>
+                <div>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                </div>
+                @* Add links for forgot password and register if desired later *@
+            </form>
+        </section>
     </div>
-    <div>
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password" />
-        <span asp-validation-for="Password"></span>
-    </div>
-    <div>
-        <input asp-for="RememberMe" />
-        <label asp-for="RememberMe">Remember me?</label>
-    </div>
-    <button type="submit">Login</button>
-</form>
+</div>
 
 @section Scripts {
     @{
