@@ -27,7 +27,7 @@ namespace CyberHub.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var user = new User { UserName = model.Email, Email = model.Email, DisplayName = model.DisplayName, PhoneNumber = model.PhoneNumber };
+            var user = new User { UserName = model.UserName, Email = model.Email,  PhoneNumber = model.PhoneNumber };
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded) {
@@ -57,12 +57,22 @@ namespace CyberHub.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-            if (result.Succeeded) {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Invalid login attempt.");
+                return View(model);
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
+
+            if (result.Succeeded)
+            {
                 return RedirectToAction("Index", "Home");
             }
-            ModelState.AddModelError("", "Invalid Login Attempt");
+            ModelState.AddModelError("", "Invalid login attempt.");
             return View(model);
+
         }
 
         //logout
