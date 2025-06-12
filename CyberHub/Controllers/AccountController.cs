@@ -40,7 +40,7 @@ namespace CyberHub.Controllers
                 await _userManager.AddToRoleAsync(user, "User");
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Main", "Home");
 
             }
             foreach (var error in result.Errors)
@@ -68,7 +68,7 @@ namespace CyberHub.Controllers
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Main", "Home");
             }
             ModelState.AddModelError("", "Invalid login attempt.");
             return View(model);

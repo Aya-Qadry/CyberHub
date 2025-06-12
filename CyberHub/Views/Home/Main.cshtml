@@ -71,118 +71,97 @@
             </nav>
         </aside>
 
-        <!-- Main Feed -->
-        <main class="main-feed">
-   
-            <!-- Feed Tabs -->
-            <div class="feed-tabs">
-                <a href="#" class="tab active">For You</a>
-                <a href="#" class="tab">Following</a>
-                <a href="#" class="tab">Trending</a>
+       
+        @model CyberHub.ViewModels.FeedViewModel
+@{
+    ViewData["Title"] = "CyberHub - Main Feed";
+}
+
+<!-- Main Feed -->
+<main class="main-feed">
+    <div class="user-header">
+        <div class="user-avatar">@(Model.CurrentUser.UserName?.Substring(0, 2).ToUpper())</div>
+        <div class="user-info">
+            <h3>@(Model.CurrentUser.UserName ?? "User")</h3>
+            <p>@(Model.CurrentUser.Email)</p>
+        </div>
+    </div>
+
+    <!-- Post Composer -->
+    <div class="post-composer">
+        @using (Html.BeginForm("CreatePost", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <textarea name="Content" class="composer-input" placeholder="What's the latest threat intel? Share your insights..." required></textarea>
+            <input type="text" name="Tags" placeholder="Tags (comma separated)" style="margin-bottom: 10px; padding: 8px; width: 100%; border: 1px solid #ddd; border-radius: 4px;" />
+            <div class="composer-actions">
+                <div class="composer-tools">
+                    <button type="button" class="tool-btn" title="Add Image"><i class="fas fa-image"></i></button>
+                    <button type="button" class="tool-btn" title="Add Poll"><i class="fas fa-poll"></i></button>
+                    <button type="button" class="tool-btn" title="Add Code"><i class="fas fa-code"></i></button>
+                    <button type="button" class="tool-btn" title="Add Link"><i class="fas fa-link"></i></button>
+                </div>
+                <button type="submit" class="post-btn">Post</button>
             </div>
+        }
+    </div>
 
-            <!-- Posts -->
-            <article class="post">
-                <div class="post-header">
-                    <div class="post-avatar"></div>
-                    <div class="post-user-info">
-                        <h4>Alex Security <span class="threat-level threat-high">CRITICAL</span></h4>
-                        <div class="post-meta">alexsec • 2 minutes ago</div>
+    <!-- Feed Tabs -->
+    <div class="feed-tabs">
+        <a href="#" class="tab active">For You</a>
+        <a href="#" class="tab">Following</a>
+        <a href="#" class="tab">Trending</a>
+    </div>
+
+    <!-- Posts -->
+    @foreach (var post in Model.Posts)
+    {
+        <article class="post">
+            <div class="post-header">
+                <div class="post-avatar">@(post.UserDisplayName.Substring(0, 2).ToUpper())</div>
+                <div class="post-user-info">
+                    <h4>@post.UserDisplayName</h4>
+                    <div class="post-meta">@post.UserDisplayName.ToLower() • @((DateTime.UtcNow - post.CreatedAt).TotalMinutes < 60 
+                        ? $"{(int)(DateTime.UtcNow - post.CreatedAt).TotalMinutes} minutes ago" 
+                        : (DateTime.UtcNow - post.CreatedAt).TotalHours < 24 
+                            ? $"{(int)(DateTime.UtcNow - post.CreatedAt).TotalHours} hours ago" 
+                            : post.CreatedAt.ToString("MMM dd"))
                     </div>
                 </div>
-                <div class="post-content">
-                    <p>🚨 BREAKING: New zero-day vulnerability discovered in popular enterprise software. CVE-2024-XXXX affects millions of installations worldwide. <a href="#" class="post-tag">#ZeroDay</a> <a href="#" class="post-tag">#CriticalVuln</a></p>
-                    <p>Initial analysis suggests remote code execution possible. Patch expected within 24-48 hours. Monitor your environments closely.</p>
-                </div>
-                <div class="post-stats">
-                    <button class="stat-btn">
-                        <i class="fas fa-thumbs-up"></i>
-                        <span>147</span>
-                    </button>
-                    <button class="stat-btn">
-                        <i class="fas fa-comment"></i>
-                        <span>23</span>
-                    </button>
-                    <button class="stat-btn">
-                        <i class="fas fa-share"></i>
-                        <span>45</span>
-                    </button>
-                    <button class="stat-btn">
-                        <i class="fas fa-bookmark"></i>
-                    </button>
-                </div>
-            </article>
+            </div>
+            <div class="post-content">
+                <p>@Html.Raw(post.Content.Replace("\n", "<br/>"))</p>
+            </div>
+            <div class="post-stats">
+                <button class="stat-btn">
+                    <i class="fas fa-thumbs-up"></i>
+                    <span>@post.LikesCount</span>
+                </button>
+                <button class="stat-btn">
+                    <i class="fas fa-comment"></i>
+                    <span>@post.CommentsCount</span>
+                </button>
+                <button class="stat-btn">
+                    <i class="fas fa-share"></i>
+                    <span>0</span>
+                </button>
+                <button class="stat-btn">
+                    <i class="fas fa-bookmark"></i>
+                </button>
+            </div>
+        </article>
+    }
 
-            <article class="post">
-                <div class="post-header">
-                    <div class="post-avatar"></div>
-                    <div class="post-user-info">
-                        <h4>Sarah Mitchell</h4>
-                        <div class="post-meta">sarahm_cyber • 15 minutes ago</div>
-                    </div>
-                </div>
-                <div class="post-content">
-                    <p>Just finished analyzing the latest phishing campaign targeting financial institutions. The sophistication level is concerning - they're using AI-generated content to bypass traditional filters.</p>
-                    <p>Thread 🧵 with IOCs and detection strategies below: <a href="#" class="post-tag">#PhishingAnalysis</a> <a href="#" class="post-tag">#ThreatIntel</a></p>
-                </div>
-                <div class="post-stats">
-                    <button class="stat-btn">
-                        <i class="fas fa-thumbs-up"></i>
-                        <span>89</span>
-                    </button>
-                    <button class="stat-btn">
-                        <i class="fas fa-comment"></i>
-                        <span>12</span>
-                    </button>
-                    <button class="stat-btn">
-                        <i class="fas fa-share"></i>
-                        <span>31</span>
-                    </button>
-                    <button class="stat-btn">
-                        <i class="fas fa-bookmark"></i>
-                    </button>
-                </div>
-            </article>
-
-            <article class="post">
-                <div class="post-header">
-                    <div class="post-avatar"></div>
-                    <div class="post-user-info">
-                        <h4>CyberNews Daily</h4>
-                        <div class="post-meta">cybernews • 1 hour ago</div>
-                    </div>
-                </div>
-                <div class="post-content">
-                    <p>📊 Weekly Threat Landscape Report:</p>
-                    <p>
-                        • Ransomware attacks ↑ 23%<br>
-                        • APT activity focused on healthcare sector<br>
-                        • New Mirai botnet variant detected<br>
-                        • Supply chain attacks targeting DevOps tools
-                    </p>
-                    <p><a href="#" class="post-tag">#WeeklyReport</a> <a href="#" class="post-tag">#ThreatLandscape</a></p>
-                </div>
-                <div class="post-stats">
-                    <button class="stat-btn">
-                        <i class="fas fa-thumbs-up"></i>
-                        <span>234</span>
-                    </button>
-                    <button class="stat-btn">
-                        <i class="fas fa-comment"></i>
-                        <span>56</span>
-                    </button>
-                    <button class="stat-btn">
-                        <i class="fas fa-share"></i>
-                        <span>78</span>
-                    </button>
-                    <button class="stat-btn">
-                        <i class="fas fa-bookmark"></i>
-                    </button>
-                </div>
-            </article>
-        </main>
-
-        <!-- Right Sidebar -->
+    @if (!Model.Posts.Any())
+    {
+        <div style="text-align: center; padding: 50px; color: #666;">
+            <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 20px;"></i>
+            <h3>No posts yet</h3>
+            <p>Be the first to share some cybersecurity insights!</p>
+        </div>
+    }
+</main>
+<!-- Right Sidebar -->
         <aside class="right-sidebar">
             <!-- Trending Threats -->
             <div class="widget">

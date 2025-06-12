@@ -73,13 +73,13 @@ body {
 }
 
 .link-primary {
-    color: #ff6b6b;
+    color: #9501ff;
     text-decoration: none;
     font-weight: 500;
 }
 
     .link-primary:hover {
-        color: #ff5252;
+        color: #9501ff;
         text-decoration: underline;
     }
 
@@ -230,7 +230,7 @@ body {
 
 .btn-login {
     padding: 14px 24px;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+    background: linear-gradient(135deg, #9305f7 0%, #9206f5 100%);
     border: none;
     border-radius: 8px;
     color: white;
@@ -242,9 +242,9 @@ body {
 }
 
     .btn-login:hover {
-        background: linear-gradient(135deg, #ff5252 0%, #f44336 100%);
+        background: linear-gradient(135deg, #9206f5 0%, #9206f5 100%);
         transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(255, 107, 107, 0.3);
+        box-shadow: 0 8px 16px #54047c;
     }
 
 /* Validation Styles */
