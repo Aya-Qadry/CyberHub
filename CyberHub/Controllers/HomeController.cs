@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using CyberHub.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CyberHub.Controllers
@@ -18,6 +19,7 @@ namespace CyberHub.Controllers
             return View();
         }
 
+        [Authorize]
         public IActionResult Privacy()
         {
             return View();
