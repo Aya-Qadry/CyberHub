@@ -1,8 +1,292 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    Layout = null;
+
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberSecFeed - Community</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>@ViewData["Title"] - CyberHub</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>CyberSecFeed</span>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-eye"></i>
+                            <span>Watchlist</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-search"></i>
+                            <span>Threats</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Community</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-book"></i>
+                            <span>Research</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Tools</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Feed -->
+        <main class="main-feed">
+            <div class="user-header">
+                <div class="user-avatar">JD</div>
+                <div class="user-info">
+                    <h3>John Doe <span class="user-badge">PRO</span></h3>
+                    <p>johndoe_sec</p>
+                </div>
+            </div>
+
+            <!-- Post Composer -->
+            <div class="post-composer">
+                <textarea class="composer-input" placeholder="What's the latest threat intel? Share your insights..."></textarea>
+                <div class="composer-actions">
+                    <div class="composer-tools">
+                        <button class="tool-btn" title="Add Image"><i class="fas fa-image"></i></button>
+                        <button class="tool-btn" title="Add Poll"><i class="fas fa-poll"></i></button>
+                        <button class="tool-btn" title="Add Code"><i class="fas fa-code"></i></button>
+                        <button class="tool-btn" title="Add Link"><i class="fas fa-link"></i></button>
+                    </div>
+                    <button class="post-btn">Post</button>
+                </div>
+            </div>
+
+            <!-- Feed Tabs -->
+            <div class="feed-tabs">
+                <a href="#" class="tab active">For You</a>
+                <a href="#" class="tab">Following</a>
+                <a href="#" class="tab">Trending</a>
+            </div>
+
+            <!-- Posts -->
+            <article class="post">
+                <div class="post-header">
+                    <div class="post-avatar"></div>
+                    <div class="post-user-info">
+                        <h4>Alex Security <span class="threat-level threat-high">CRITICAL</span></h4>
+                        <div class="post-meta">alexsec • 2 minutes ago</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <p>🚨 BREAKING: New zero-day vulnerability discovered in popular enterprise software. CVE-2024-XXXX affects millions of installations worldwide. <a href="#" class="post-tag">#ZeroDay</a> <a href="#" class="post-tag">#CriticalVuln</a></p>
+                    <p>Initial analysis suggests remote code execution possible. Patch expected within 24-48 hours. Monitor your environments closely.</p>
+                </div>
+                <div class="post-stats">
+                    <button class="stat-btn">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span>147</span>
+                    </button>
+                    <button class="stat-btn">
+                        <i class="fas fa-comment"></i>
+                        <span>23</span>
+                    </button>
+                    <button class="stat-btn">
+                        <i class="fas fa-share"></i>
+                        <span>45</span>
+                    </button>
+                    <button class="stat-btn">
+                        <i class="fas fa-bookmark"></i>
+                    </button>
+                </div>
+            </article>
+
+            <article class="post">
+                <div class="post-header">
+                    <div class="post-avatar"></div>
+                    <div class="post-user-info">
+                        <h4>Sarah Mitchell</h4>
+                        <div class="post-meta">sarahm_cyber • 15 minutes ago</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <p>Just finished analyzing the latest phishing campaign targeting financial institutions. The sophistication level is concerning - they're using AI-generated content to bypass traditional filters.</p>
+                    <p>Thread 🧵 with IOCs and detection strategies below: <a href="#" class="post-tag">#PhishingAnalysis</a> <a href="#" class="post-tag">#ThreatIntel</a></p>
+                </div>
+                <div class="post-stats">
+                    <button class="stat-btn">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span>89</span>
+                    </button>
+                    <button class="stat-btn">
+                        <i class="fas fa-comment"></i>
+                        <span>12</span>
+                    </button>
+                    <button class="stat-btn">
+                        <i class="fas fa-share"></i>
+                        <span>31</span>
+                    </button>
+                    <button class="stat-btn">
+                        <i class="fas fa-bookmark"></i>
+                    </button>
+                </div>
+            </article>
+
+            <article class="post">
+                <div class="post-header">
+                    <div class="post-avatar"></div>
+                    <div class="post-user-info">
+                        <h4>CyberNews Daily</h4>
+                        <div class="post-meta">cybernews • 1 hour ago</div>
+                    </div>
+                </div>
+                <div class="post-content">
+                    <p>📊 Weekly Threat Landscape Report:</p>
+                    <p>
+                        • Ransomware attacks ↑ 23%<br>
+                        • APT activity focused on healthcare sector<br>
+                        • New Mirai botnet variant detected<br>
+                        • Supply chain attacks targeting DevOps tools
+                    </p>
+                    <p><a href="#" class="post-tag">#WeeklyReport</a> <a href="#" class="post-tag">#ThreatLandscape</a></p>
+                </div>
+                <div class="post-stats">
+                    <button class="stat-btn">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span>234</span>
+                    </button>
+                    <button class="stat-btn">
+                        <i class="fas fa-comment"></i>
+                        <span>56</span>
+                    </button>
+                    <button class="stat-btn">
+                        <i class="fas fa-share"></i>
+                        <span>78</span>
+                    </button>
+                    <button class="stat-btn">
+                        <i class="fas fa-bookmark"></i>
+                    </button>
+                </div>
+            </article>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="right-sidebar">
+            <!-- Trending Threats -->
+            <div class="widget">
+                <div class="widget-header">
+                    <i class="fas fa-fire"></i>
+                    <span>Trending Threats</span>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">1</div>
+                    <div class="trending-info">
+                        <div class="trending-title">Log4Shell Variants</div>
+                        <div class="trending-meta">2.3K discussions</div>
+                    </div>
+                    <span class="threat-level threat-high">HIGH</span>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">2</div>
+                    <div class="trending-info">
+                        <div class="trending-title">APT29 Campaign</div>
+                        <div class="trending-meta">1.8K discussions</div>
+                    </div>
+                    <span class="threat-level threat-medium">MED</span>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">3</div>
+                    <div class="trending-info">
+                        <div class="trending-title">Cloud Misconfigurations</div>
+                        <div class="trending-meta">1.2K discussions</div>
+                    </div>
+                    <span class="threat-level threat-medium">MED</span>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">4</div>
+                    <div class="trending-info">
+                        <div class="trending-title">Supply Chain Attacks</div>
+                        <div class="trending-meta">956 discussions</div>
+                    </div>
+                    <span class="threat-level threat-low">LOW</span>
+                </div>
+            </div>
+
+            <!-- Trending Topics -->
+            <div class="widget">
+                <div class="widget-header">
+                    <i class="fas fa-hashtag"></i>
+                    <span>Trending Topics</span>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">1</div>
+                    <div class="trending-info">
+                        <div class="trending-title">#ZeroTrust</div>
+                        <div class="trending-meta">12.5K posts</div>
+                    </div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">2</div>
+                    <div class="trending-info">
+                        <div class="trending-title">#ThreatHunting</div>
+                        <div class="trending-meta">8.9K posts</div>
+                    </div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">3</div>
+                    <div class="trending-info">
+                        <div class="trending-title">#IncidentResponse</div>
+                        <div class="trending-meta">7.2K posts</div>
+                    </div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">4</div>
+                    <div class="trending-info">
+                        <div class="trending-title">#RedTeam</div>
+                        <div class="trending-meta">5.8K posts</div>
+                    </div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">5</div>
+                    <div class="trending-info">
+                        <div class="trending-title">#OSINT</div>
+                        <div class="trending-meta">4.1K posts</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</body>
+</html>
