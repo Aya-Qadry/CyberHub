@@ -42,6 +42,9 @@ namespace CyberHub.Models
         [Display(Name = "Category")]
         public int CategoryId { get; set; }
 
+        public string? ImageUrl { get; set; }
+
+
         public virtual User Author { get; set; } = null!;
         public virtual Category Category { get; set; } = null!;
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();

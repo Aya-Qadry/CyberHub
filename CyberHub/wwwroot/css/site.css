@@ -135,6 +135,66 @@ body {
     resize: none;
 }
 
+.category-dropdown {
+    width: 100%;
+    background: #333333;
+    border: 1px solid #555555;
+    border-radius: 6px;
+    color: white;
+/*    font-size: 14px;*/
+    padding: 10px 12px;
+/*    margin-bottom: 10px;*/
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .category-dropdown:hover {
+        border-color: #00d4ff;
+        background: #3a3a3a;
+    }
+
+    .category-dropdown:focus {
+        border-color: #00d4ff;
+        box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+    }
+
+    .category-dropdown option {
+        background: #333333;
+        color: white;
+        padding: 8px;
+    }
+
+.tags-input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid #555555;
+    border-radius: 6px;
+    color: white;
+    font-size: 14px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+    .tags-input:hover {
+        border-color: #00d4ff;
+    }
+
+    .tags-input:focus {
+        border-color: #00d4ff;
+        box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+    }
+
+.tags-error {
+    color: #ff4757;
+    font-size: 12px;
+    margin-top: -8px;
+    margin-bottom: 10px;
+    padding-left: 12px;
+}
+
 .composer-actions {
     display: flex;
     justify-content: space-between;
@@ -194,10 +254,17 @@ body {
     transition: all 0.3s ease;
 }
 
-    .tab.active {
-        color: #00d4ff;
-        border-bottom-color: #00d4ff;
-    }
+.tags-input::placeholder {
+    color: #888888;
+}
+
+.tags-error {
+    color: #ff4757;
+    font-size: 12px;
+    margin-top: -8px;
+    margin-bottom: 10px;
+    padding-left: 12px;
+}
 
 /* Posts */
 .post {

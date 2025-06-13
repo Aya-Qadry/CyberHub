@@ -87,24 +87,58 @@
         </div>
     </div>
 
-    <!-- Post Composer -->
-    <div class="post-composer">
-        @using (Html.BeginForm("CreatePost", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
-        {
-            @Html.AntiForgeryToken()
-            <textarea name="Content" class="composer-input" placeholder="What's the latest threat intel? Share your insights..." required></textarea>
-            <input type="text" name="Tags" placeholder="Tags (comma separated)" style="margin-bottom: 10px; padding: 8px; width: 100%; border: 1px solid #ddd; border-radius: 4px;" />
-            <div class="composer-actions">
-                <div class="composer-tools">
-                    <button type="button" class="tool-btn" title="Add Image"><i class="fas fa-image"></i></button>
-                    <button type="button" class="tool-btn" title="Add Poll"><i class="fas fa-poll"></i></button>
-                    <button type="button" class="tool-btn" title="Add Code"><i class="fas fa-code"></i></button>
-                    <button type="button" class="tool-btn" title="Add Link"><i class="fas fa-link"></i></button>
-                </div>
-                <button type="submit" class="post-btn">Post</button>
+            <div class="post-composer">
+                @using (Html.BeginForm("CreatePost", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    @Html.TextAreaFor(m => m.NewPost.Content, new
+                        {
+                            @class = "composer-input",
+                            placeholder = "What's the latest threat intel? Share your insights...",
+                            required = "required"
+                        })
+
+                    @Html.TextBoxFor(m => m.NewPost.Tags, new
+                        {
+                            @class = "tags-input",
+                            placeholder = "Tags (e.g., #cybersecurity #malware #threatintel)",
+                            id = "tagsInput"
+                        })
+
+                    <div class="tags-error" id="tagsError" style="display: none;">
+                        Each tag must start with # and be separated by spaces
+                    </div>
+
+                    <div class="composer-actions">
+                        <div class="composer-tools">
+                            <label class="tool-btn" title="Add Image">
+                                <i class="fas fa-image"></i>
+                                <input type="file" name="Image" accept="image/*" class="image-input" style="display: none;" />
+                            </label>
+
+                            @Html.DropDownListFor(m => m.NewPost.CategoryId, new SelectList(new[]
+                                     {
+                        new { Value = "1", Text = "Malware" },
+                        new { Value = "2", Text = "Vulnerabilities" },
+                        new { Value = "3", Text = "Best Practices" },
+                        new { Value = "4", Text = "Network Security" },
+                        new { Value = "5", Text = "Application Security" },
+                        new { Value = "6", Text = "Cloud Security" },
+                        new { Value = "7", Text = "Mobile Security" },
+                        new { Value = "8", Text = "CTFs & Challenges" },
+                        new { Value = "9", Text = "Learning Resources" },
+                        new { Value = "10", Text = "Ethical Hacking" },
+                        new { Value = "11", Text = "Careers & Certifications" }
+                        }, "Value", "Text"),
+                                     "Select a category...",
+                                     new { @class = "category-dropdown", required = "required" })
+                        </div>
+
+                        <button type="submit" class="post-btn">Post</button>
+                    </div>
+                }
             </div>
-        }
-    </div>
 
     <!-- Feed Tabs -->
     <div class="feed-tabs">
@@ -247,5 +281,48 @@
             </div>
         </aside>
     </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tagsInput = document.getElementById('tagsInput');
+    const tagsError = document.getElementById('tagsError');
+    const form = tagsInput.closest('form');
+    
+    function validateTags(value) {
+        if (!value.trim()) return true; // Empty is valid
+        
+        const tags = value.trim().split(/\s+/);
+        return tags.every(tag => tag.startsWith('#') && tag.length > 1);
+    }
+    
+    function showError(show) {
+        tagsError.style.display = show ? 'block' : 'none';
+        tagsInput.style.borderColor = show ? '#ff4757' : '#555555';
+    }
+    
+    // Real-time validation on input
+    tagsInput.addEventListener('input', function() {
+        const isValid = validateTags(this.value);
+        showError(!isValid);
+    });
+    
+    // Validation on blur
+    tagsInput.addEventListener('blur', function() {
+        const isValid = validateTags(this.value);
+        showError(!isValid);
+    });
+    
+    // Prevent form submission if tags are invalid
+    form.addEventListener('submit', function(e) {
+        const isValid = validateTags(tagsInput.value);
+        if (!isValid) {
+            e.preventDefault();
+            showError(true);
+            tagsInput.focus();
+        }
+    });
+});
+</script>
+
 </body>
 </html>

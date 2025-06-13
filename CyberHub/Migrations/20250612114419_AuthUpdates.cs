@@ -10,9 +10,9 @@ namespace CyberHub.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "DisplayName",
-                table: "AspNetUsers");
+            //migrationBuilder.DropColumn(
+            //    name: "DisplayName",
+            //    table: "AspNetUsers");
         }
 
         /// <inheritdoc />

@@ -83,15 +83,37 @@ namespace CyberHub.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
+
+            string imagePath = null;
+
+            if (model.Image != null && model.Image.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                Directory.CreateDirectory(uploadsFolder);  
+
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(model.Image.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.Image.CopyToAsync(stream);
+                }
+
+                imagePath = "/uploads/" + uniqueFileName;
+            }
+
+
+
             var post = new Post
             {
                 Subject = model.Content.Length > 50 ? model.Content.Substring(0, 50) + "..." : model.Content,
                 Content = model.Content,
                 Snippet = model.Content.Length > 300 ? model.Content.Substring(0, 300) + "..." : model.Content,
                 AuthorId = currentUser.Id,
-                CategoryId = 1, 
+                CategoryId = model.CategoryId,
                 CreatedAt = DateTime.UtcNow,
-                IsPublished = true
+                IsPublished = true,
+                ImageUrl = imagePath
             };
 
             _context.Posts.Add(post);

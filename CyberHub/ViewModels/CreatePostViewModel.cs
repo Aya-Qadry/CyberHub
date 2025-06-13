@@ -9,7 +9,8 @@ namespace CyberHub.ViewModels
         public string Content { get; set; } = string.Empty;
 
         public IFormFile? Image { get; set; }
+        public string Tags { get; set; }
+        public int CategoryId { get; set; }  
 
-        public string? Tags { get; set; }
     }
 }

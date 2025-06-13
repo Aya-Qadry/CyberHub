@@ -38,7 +38,15 @@ namespace CyberHub.Data
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Malware", Description = "Discussions about viruses, worms, ransomware..." },
                 new Category { Id = 2, Name = "Vulnerabilities", Description = "Reports and fixes of known vulnerabilities" },
-                new Category { Id = 3, Name = "Best Practices", Description = "Security tips and best practices" }
+                new Category { Id = 3, Name = "Best Practices", Description = "Security tips and best practices" },
+                new Category { Id = 4, Name = "Network Security", Description = "Firewalls, IDS/IPS, VPNs, and secure protocols" },
+                new Category { Id = 5, Name = "Application Security", Description = "Securing software, code review, OWASP topics" },
+                new Category { Id = 6, Name = "Cloud Security", Description = "Threats and protections in AWS, Azure, GCP..." },
+                new Category { Id = 7, Name = "Mobile Security", Description = "Security concerns on Android and iOS" },
+                new Category { Id = 8, Name = "CTFs & Challenges", Description = "Capture the Flag events, walkthroughs, and practice" },
+                new Category { Id = 9, Name = "Learning Resources", Description = "Courses, books, blogs, and guides" },
+                new Category { Id = 10, Name = "Ethical Hacking", Description = "White-hat hacking techniques and certifications" },
+                new Category { Id = 11, Name = "Careers & Certifications", Description = "Advice on certs like CISSP, CEH, OSCP..." }
             );
 
             modelBuilder.Entity<Comment>()
