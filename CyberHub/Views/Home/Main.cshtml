@@ -27,46 +27,24 @@
             <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
-                        <a href="#" class="nav-link active">
+                        <a asp-controller="Home" asp-action="Main" class="nav-link active">
                             <i class="fas fa-home"></i>
                             <span>Home</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                            <a asp-controller="Home" asp-action="MyPosts" class="nav-link">
+
                             <i class="fas fa-chart-line"></i>
-                            <span>Analytics</span>
+                            <span>My posts</span>
                         </a>
                     </li>
+                  
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-eye"></i>
-                            <span>Watchlist</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-search"></i>
-                            <span>Threats</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-users"></i>
-                            <span>Community</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-book"></i>
-                            <span>Research</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-cog"></i>
-                            <span>Tools</span>
-                        </a>
+                         <a asp-controller="Account" asp-action="Settings" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
                     </li>
                 </ul>
             </nav>
@@ -80,13 +58,32 @@
 
 <!-- Main Feed -->
 <main class="main-feed">
-    <div class="user-header">
+    @* <div class="user-header">
         <div class="user-avatar">@(Model.CurrentUser.UserName?.Substring(0, 2).ToUpper())</div>
         <div class="user-info">
             <h3>@(Model.CurrentUser.UserName ?? "User")</h3>
             <p>@(Model.CurrentUser.Email)</p>
         </div>
+    </div> *@
+
+    <div class="user-header">
+    <div class="user-avatar">
+        @if (!string.IsNullOrEmpty(Model.CurrentUser.ProfilePictureUrl))
+        {
+            <img src="@Url.Content(Model.CurrentUser.ProfilePictureUrl)" alt="@Model.CurrentUser.UserName" />
+        }
+        else
+        {
+            @(Model.CurrentUser.UserName?.Substring(0, 2).ToUpper())
+        }
     </div>
+    <div class="user-info">
+        <h3>@(Model.CurrentUser.UserName ?? "User")</h3>
+        <p>@(Model.CurrentUser.Email)</p>
+    </div>
+</div>
+
+
 
             <div class="post-composer">
                 @using (Html.BeginForm("CreatePost", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -162,107 +159,109 @@
 
     <!-- Posts -->
     @foreach (var post in Model.Posts)
-    {
-        <article class="post">
-            <div class="post-header">
-                <div class="post-avatar">@(post.UserDisplayName.Substring(0, 2).ToUpper())</div>
-                <div class="post-user-info">
-                    <h4>@post.UserDisplayName</h4>
-                    <div class="post-meta">@post.UserDisplayName.ToLower() • @((DateTime.UtcNow - post.CreatedAt).TotalMinutes < 60 
-                        ? $"{(int)(DateTime.UtcNow - post.CreatedAt).TotalMinutes} minutes ago" 
-                        : (DateTime.UtcNow - post.CreatedAt).TotalHours < 24 
-                            ? $"{(int)(DateTime.UtcNow - post.CreatedAt).TotalHours} hours ago" 
-                            : post.CreatedAt.ToString("MMM dd"))
-                    </div>
-                </div>
-            </div>
-
-            @* nv *@
-
-            <div class="post-category">
-                 @post.CategoryName
-            </div>
-
-            
-            <div class="post-content">
-                <p>@Html.Raw(post.Content.Replace("\n", "<br/>"))</p>
-            </div>
-
-            @if (!string.IsNullOrEmpty(post.ImageUrl))
-            {
-                <div class="post-image" style="margin: 15px 0;">
-                    <img src="@Url.Content(post.ImageUrl)" alt="Post image" style="max-width: 100%; border-radius: 12px;" />
-                </div>
-            }
-
-            
-            @if (post.Tags != null && post.Tags.Any())
-            {
-                <div class="post-tags">
-                    @foreach (var tag in post.Tags)
-                    {
-                        <a href="#" class="post-tag">#@tag</a>
-                    }
-                </div>
-            }
-            <div class="post-stats">
-                @* <button class="stat-btn like-btn" data-post-id="@post.Id"> *@
-                <button class="stat-btn like-btn @(post.IsLikedByCurrentUser ? "liked" : "")" data-post-id="@post.Id">
-                    <i class="fas fa-thumbs-up"></i>
-                    <span class="like-count">@post.LikesCount</span>
-                </button>
-
-
-                <button class="stat-btn comment-toggle-btn" data-post-id="@post.Id">
-                    <i class="fas fa-comment"></i>
-                    <span>@post.CommentsCount</span>
-                </button>
-                @* <button class="stat-btn">
-                    <i class="fas fa-share"></i>
-                    <span>0</span>
-                </button>
-                <button class="stat-btn">
-                    <i class="fas fa-bookmark"></i>
-                </button> *@
-            </div>
-
-             <div class="comment-form-container" id="comment-form-@post.Id" style="display: none; margin-top: 10px;">
-              
-                @* <form method="post" asp-controller="Home" asp-action="AddComment">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="postId" value="@post.Id" />
-                    <textarea name="content" placeholder="Write a comment..." required style="width: 100%; padding: 10px; border-radius: 6px;" id="adding"></textarea>
-                    <button type="submit" style="margin-top: 5px;" class="post-btn">Submit</button>
-                </form> *@
-
-                <form method="post" class="comment-form" data-post-id="@post.Id" asp-controller="Home" asp-action="AddComment">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="postId" value="@post.Id" />
-                    <textarea name="content" placeholder="Write a comment..." required style="width: 100%; padding: 10px; border-radius: 6px;" , id="adding"></textarea>
-                    <button type="submit" style="margin-top: 5px;" class="post-btn">Submit</button>
-                </form>
-
-
-            </div>
-
-            @if (post.Comments.Any())
 {
-    <div class="comments-section" style="margin-top: 10px;">
-        @foreach (var comment in post.Comments)
+    <article class="post">
+        <div class="post-header">
+            <div class="post-avatar">
+                @if (!string.IsNullOrEmpty(post.UserProfileImageUrl))
+                {
+                    <img src="@Url.Content(post.UserProfileImageUrl)" alt="@post.UserDisplayName" />
+                }
+                else
+                {
+                    @(post.UserDisplayName.Substring(0, 2).ToUpper())
+                }
+            </div>
+            <div class="post-user-info">
+                <h4>@post.UserDisplayName</h4>
+                <div class="post-meta">@post.UserDisplayName.ToLower() • @((DateTime.UtcNow - post.CreatedAt).TotalMinutes < 60 
+                    ? $"{(int)(DateTime.UtcNow - post.CreatedAt).TotalMinutes} minutes ago" 
+                    : (DateTime.UtcNow - post.CreatedAt).TotalHours < 24 
+                        ? $"{(int)(DateTime.UtcNow - post.CreatedAt).TotalHours} hours ago" 
+                        : post.CreatedAt.ToString("MMM dd"))
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rest of the post content stays the same -->
+        <div class="post-category">
+             @post.CategoryName
+        </div>
+        
+        <div class="post-content">
+            <p>@Html.Raw(post.Content.Replace("\n", "<br/>"))</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(post.ImageUrl))
         {
-            <div class="comment" style="padding: 8px; border-bottom: 1px solid #333;">
-                <strong>@comment.AuthorName</strong> • 
-                <small>@comment.CreatedAt.ToString("MMM dd, HH:mm")</small>
-                <p>@comment.Content</p>
+            <div class="post-image" style="margin: 15px 0;">
+                <img src="@Url.Content(post.ImageUrl)" alt="Post image" style="max-width: 100%; border-radius: 12px;" />
             </div>
         }
-    </div>
+        
+        @if (post.Tags != null && post.Tags.Any())
+        {
+            <div class="post-tags">
+                @foreach (var tag in post.Tags)
+                {
+                    <a href="#" class="post-tag">#@tag</a>
+                }
+            </div>
+        }
+        
+        <!-- Rest of post stats and form stays the same -->
+        <div class="post-stats">
+            <button class="stat-btn like-btn @(post.IsLikedByCurrentUser ? "liked" : "")" data-post-id="@post.Id">
+                <i class="fas fa-thumbs-up"></i>
+                <span class="like-count">@post.LikesCount</span>
+            </button>
+
+            <button class="stat-btn comment-toggle-btn" data-post-id="@post.Id">
+                <i class="fas fa-comment"></i>
+                <span>@post.CommentsCount</span>
+            </button>
+        </div>
+
+        <div class="comment-form-container" id="comment-form-@post.Id" style="display: none; margin-top: 10px;">
+            <form method="post" class="comment-form" data-post-id="@post.Id" asp-controller="Home" asp-action="AddComment">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="postId" value="@post.Id" />
+                <textarea name="content" placeholder="Write a comment..." required style="width: 100%; padding: 10px; border-radius: 6px;"></textarea>
+                <button type="submit" style="margin-top: 5px;" class="post-btn">Submit</button>
+            </form>
+        </div>
+
+        @if (post.Comments.Any())
+        {
+            <div class="comments-section" style="margin-top: 10px;">
+                @foreach (var comment in post.Comments)
+                {
+                    <div class="comment" style="padding: 8px; border-bottom: 1px solid #333; display: flex; align-items: flex-start; gap: 10px;">
+                        <div class="comment-avatar" style="width: 30px; height: 30px; border-radius: 50%; background: #444; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">
+                            @if (!string.IsNullOrEmpty(comment.AuthorProfileImageUrl))
+                            {
+                                <img src="@Url.Content(comment.AuthorProfileImageUrl)" alt="@comment.AuthorName" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                @(comment.AuthorName.Length >= 2 ? comment.AuthorName.Substring(0, 2).ToUpper() : comment.AuthorName.ToUpper())
+                            }
+                        </div>
+                        <div class="comment-content" style="flex: 1;">
+                            <div style="margin-bottom: 4px;">
+                                <strong>@comment.AuthorName</strong> • 
+                                <small>@comment.CreatedAt.ToString("MMM dd, HH:mm")</small>
+                            </div>
+                            <p style="margin: 0;">@comment.Content</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </article>
 }
-
-
-        </article>
-    }
-
+    
+    
     @if (!Model.Posts.Any())
     {
         <div style="text-align: center; padding: 50px; color: #666;">
@@ -363,6 +362,7 @@
             </div>
         </aside>
     </div>
+
 
     <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -496,7 +496,7 @@ document.querySelectorAll('.like-btn').forEach(btn => {
     });
 
 </script>
-<script>
+    <script>
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.comment-form').forEach(form => {
             form.addEventListener('submit', async function (e) {

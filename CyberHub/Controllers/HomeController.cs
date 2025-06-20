@@ -28,7 +28,7 @@ namespace CyberHub.Controllers
             return View();
         }
 
-        [Authorize]
+
         public async Task<IActionResult> Main()
         {
             var currentUser = await _userManager.GetUserAsync(User);
@@ -42,7 +42,6 @@ namespace CyberHub.Controllers
             var posts = await _context.Posts
                 .Include(p => p.Author)
                 .Include(p => p.Category)
-                //.Include(p => p.Comments)
                 .Include(p => p.PostTags)
                     .ThenInclude(pt => pt.Tag)
                  .Include(p => p.PostLikes)
@@ -50,7 +49,7 @@ namespace CyberHub.Controllers
                        .ThenInclude(c => c.Author)
                 .Where(p => p.IsPublished)
                 .OrderByDescending(p => p.CreatedAt)
-                .Take(20) // 20 most recent posts
+                .Take(20)
                 .ToListAsync();
 
             var postViewModels = posts.Select(p => new PostViewModel
@@ -60,25 +59,23 @@ namespace CyberHub.Controllers
                 CreatedAt = p.CreatedAt,
                 UserId = p.AuthorId,
                 UserDisplayName = p.Author.UserName ?? "Unknown User",
+                UserProfileImageUrl = p.Author.ProfilePictureUrl, // Add this line
                 LikesCount = p.PostLikes.Count,
                 CommentsCount = p.Comments.Count,
-                //nv
                 CategoryName = p.Category?.Name ?? "Other",
                 Tags = p.PostTags.Select(pt => pt.Tag.Name).ToList(),
                 ImageUrl = p.ImageUrl,
-
                 IsLikedByCurrentUser = p.PostLikes.Any(pl => pl.UserId == userId),
-                
+
                 Comments = p.Comments
                     .OrderByDescending(c => c.CreatedAt)
                     .Select(c => new CommentViewModel
                     {
                         Content = c.Content,
                         AuthorName = c.Author.UserName ?? "User",
+                        AuthorProfileImageUrl = c.Author.ProfilePictureUrl, // Add this line
                         CreatedAt = c.CreatedAt
                     }).ToList()
-
-
             }).ToList();
 
             var feedViewModel = new FeedViewModel
@@ -90,6 +87,8 @@ namespace CyberHub.Controllers
 
             return View(feedViewModel);
         }
+
+
 
         //[HttpPost]
         //[Authorize]
@@ -361,5 +360,94 @@ namespace CyberHub.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+
+        [Authorize]
+        public async Task<IActionResult> MyPosts()
+        {
+            try
+            {
+                // Debug: Check if user is authenticated
+                if (!User.Identity.IsAuthenticated)
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                // Get user ID from claims
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userName = User.Identity.Name;
+
+                // Debug: Log user info
+                System.Diagnostics.Debug.WriteLine($"User ID: {userId}");
+                System.Diagnostics.Debug.WriteLine($"User Name: {userName}");
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    // Fallback to username if userId is null
+                    if (!string.IsNullOrEmpty(userName))
+                    {
+                        var userByName = await _context.Users
+                            .FirstOrDefaultAsync(u => u.UserName == userName);
+                        userId = userByName?.Id;
+                    }
+
+                    if (string.IsNullOrEmpty(userId))
+                    {
+                        return RedirectToAction("Login", "Account");
+                    }
+                }
+
+                // Get user
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("User not found in database");
+                    return RedirectToAction("Login", "Account");
+                }
+
+                System.Diagnostics.Debug.WriteLine($"Found user: {user.UserName}");
+
+                // Get posts with all necessary includes
+                var posts = await _context.Posts
+                    .Where(p => p.AuthorId == userId)
+                    .Include(p => p.Author)
+                    .Include(p => p.Category)
+                    .Include(p => p.Comments)
+                        .ThenInclude(c => c.Author)
+                    .Include(p => p.PostTags)
+                    .Include(p => p.PostLikes)
+                    .OrderByDescending(p => p.CreatedAt)
+                    .ToListAsync();
+
+                System.Diagnostics.Debug.WriteLine($"Found {posts.Count} posts");
+
+                var model = new MyPostsViewModel
+                {
+                    CurrentUser = user,
+                    Posts = posts
+                };
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                // Debug: Log the full exception
+                System.Diagnostics.Debug.WriteLine($"Error in MyPosts: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+
+                // You can also add logging here if you have a logger configured
+                // _logger.LogError(ex, "Error loading MyPosts page");
+
+                // For debugging purposes, return error details
+                // Remove this in production and use a proper error page
+                return View("Error", new ErrorViewModel { RequestId = ex.Message });
+            }
+        }
+
+
     }
+
+
 }

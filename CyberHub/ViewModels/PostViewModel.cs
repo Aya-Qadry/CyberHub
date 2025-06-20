@@ -12,6 +12,7 @@
 
         public int LikesCount { get; set; }
         public int CommentsCount { get; set; }
+        public string? UserProfileImageUrl { get; set; } // Add this line
 
         public bool IsLikedByCurrentUser { get; set; }
 

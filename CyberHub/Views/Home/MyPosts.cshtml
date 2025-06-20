@@ -1,0 +1,285 @@
+﻿@{
+    ViewData["Title"] = "Posts Page";
+    Layout = null;
+
+}
+@model CyberHub.ViewModels.MyPostsViewModel
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberHub - Community</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>@ViewData["Title"] - CyberHub</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                @* <i class="fas fa-shield-alt"></i> *@
+                <img src="~/images/logo-CH.png" alt="CyberHub Logo" class="illustration-logo" />
+                <span>CyberHub</span>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a asp-controller="Home" asp-action="Main" class="nav-link active">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>My posts</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a asp-controller="Account" asp-action="Settings" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        
+<!-- Main Feed -->
+<main class="main-feed">
+
+
+    <div class="user-header">
+    <div class="user-avatar">
+        @if (!string.IsNullOrEmpty(Model.CurrentUser.ProfilePictureUrl))
+        {
+            <img src="@Url.Content(Model.CurrentUser.ProfilePictureUrl)" alt="@Model.CurrentUser.UserName" />
+        }
+        else
+        {
+            @(Model.CurrentUser.UserName?.Substring(0, 2).ToUpper())
+        }
+    </div>
+    <div class="user-info">
+        <h3>@(Model.CurrentUser.UserName ?? "User")</h3>
+        <p>@(Model.CurrentUser.Email)</p>
+    </div>
+</div>
+
+
+
+    <!-- Posts -->
+    @foreach (var post in Model.Posts)
+{
+    <article class="post">
+        <div class="post-header">
+            <div class="post-avatar">
+                @if (!string.IsNullOrEmpty(post.Author.ProfilePictureUrl))
+                {
+                    <img src="@Url.Content(post.Author.ProfilePictureUrl)" alt="@post.Author.UserName" />
+                }
+                else
+                {
+                    @(post.Author.UserName.Substring(0, 2).ToUpper())
+                }
+            </div>
+            <div class="post-user-info">
+                <h4>@post.Author.UserName</h4>
+                <div class="post-meta">@post.Author.UserName.ToLower() • @((DateTime.UtcNow - post.CreatedAt).TotalMinutes < 60 
+                    ? $"{(int)(DateTime.UtcNow - post.CreatedAt).TotalMinutes} minutes ago" 
+                    : (DateTime.UtcNow - post.CreatedAt).TotalHours < 24 
+                        ? $"{(int)(DateTime.UtcNow - post.CreatedAt).TotalHours} hours ago" 
+                        : post.CreatedAt.ToString("MMM dd"))
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rest of the post content stays the same -->
+        <div class="post-category">
+             @post.Category.Name
+        </div>
+        
+        <div class="post-content">
+            <p>@Html.Raw(post.Content.Replace("\n", "<br/>"))</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(post.ImageUrl))
+        {
+            <div class="post-image" style="margin: 15px 0;">
+                <img src="@Url.Content(post.ImageUrl)" alt="Post image" style="max-width: 100%; border-radius: 12px;" />
+            </div>
+        }
+        
+        @if (post.PostTags != null && post.PostTags.Any())
+        {
+            <div class="post-tags">
+                @foreach (var tag in post.PostTags)
+                {
+                    <a href="#" class="post-tag">#@tag</a>
+                }
+            </div>
+        }
+        
+        <!-- Rest of post stats and form stays the same -->
+        <div class="post-stats">
+            @* <button class="stat-btn like-btn @(post.IsLikedByCurrentUser ? "liked" : "")" data-post-id="@post.Id">
+                <i class="fas fa-thumbs-up"></i>
+                <span class="like-count">@post.PostLikes.Count</span>
+            </button> *@
+
+            <button class="stat-btn comment-toggle-btn" data-post-id="@post.Id">
+                <i class="fas fa-comment"></i>
+                <span>@post.Comments.Count</span>
+            </button>
+        </div>
+
+        <div class="comment-form-container" id="comment-form-@post.Id" style="display: none; margin-top: 10px;">
+            <form method="post" class="comment-form" data-post-id="@post.Id" asp-controller="Home" asp-action="AddComment">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="postId" value="@post.Id" />
+                <textarea name="content" placeholder="Write a comment..." required style="width: 100%; padding: 10px; border-radius: 6px;"></textarea>
+                <button type="submit" style="margin-top: 5px;" class="post-btn">Submit</button>
+            </form>
+        </div>
+
+        @if (post.Comments.Any())
+        {
+            <div class="comments-section" style="margin-top: 10px;">
+                @foreach (var comment in post.Comments)
+                {
+                    <div class="comment" style="padding: 8px; border-bottom: 1px solid #333; display: flex; align-items: flex-start; gap: 10px;">
+                        <div class="comment-avatar" style="width: 30px; height: 30px; border-radius: 50%; background: #444; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;">
+                            @if (!string.IsNullOrEmpty(comment.Author.ProfilePictureUrl))
+                            {
+                                <img src="@Url.Content(comment.Author.ProfilePictureUrl)" alt="@comment.Author.UserName" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                @(comment.Author.UserName.Length >= 2 ? comment.Author.UserName.Substring(0, 2).ToUpper() : comment.Author.UserName.ToUpper())
+                            }
+                        </div>
+                        <div class="comment-content" style="flex: 1;">
+                            <div style="margin-bottom: 4px;">
+                                <strong>@comment.Author.UserName</strong> • 
+                                <small>@comment.CreatedAt.ToString("MMM dd, HH:mm")</small>
+                            </div>
+                            <p style="margin: 0;">@comment.Content</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </article>
+}
+    
+    
+    @if (!Model.Posts.Any())
+    {
+        <div style="text-align: center; padding: 50px; color: #666;">
+            <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 20px;"></i>
+            <h3>No posts yet</h3>
+            <p>Be the first to share some cybersecurity insights!</p>
+        </div>
+    }
+
+
+</main>
+
+
+
+<!-- Right Sidebar -->
+        <aside class="right-sidebar">
+            <!-- Trending Threats -->
+            <div class="widget">
+                <div class="widget-header">
+                    <i class="fas fa-fire"></i>
+                    <span>Trending Threats</span>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">1</div>
+                    <div class="trending-info">
+                        <div class="trending-title">Log4Shell Variants</div>
+                        <div class="trending-meta">2.3K discussions</div>
+                    </div>
+                    <span class="threat-level threat-high">HIGH</span>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">2</div>
+                    <div class="trending-info">
+                        <div class="trending-title">APT29 Campaign</div>
+                        <div class="trending-meta">1.8K discussions</div>
+                    </div>
+                    <span class="threat-level threat-medium">MED</span>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">3</div>
+                    <div class="trending-info">
+                        <div class="trending-title">Cloud Misconfigurations</div>
+                        <div class="trending-meta">1.2K discussions</div>
+                    </div>
+                    <span class="threat-level threat-medium">MED</span>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">4</div>
+                    <div class="trending-info">
+                        <div class="trending-title">Supply Chain Attacks</div>
+                        <div class="trending-meta">956 discussions</div>
+                    </div>
+                    <span class="threat-level threat-low">LOW</span>
+                </div>
+            </div>
+
+            <!-- Trending Topics -->
+            <div class="widget">
+                <div class="widget-header">
+                    <i class="fas fa-hashtag"></i>
+                    <span>Trending Topics</span>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">1</div>
+                    <div class="trending-info">
+                        <div class="trending-title">#ZeroTrust</div>
+                        <div class="trending-meta">12.5K posts</div>
+                    </div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">2</div>
+                    <div class="trending-info">
+                        <div class="trending-title">#ThreatHunting</div>
+                        <div class="trending-meta">8.9K posts</div>
+                    </div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">3</div>
+                    <div class="trending-info">
+                        <div class="trending-title">#IncidentResponse</div>
+                        <div class="trending-meta">7.2K posts</div>
+                    </div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">4</div>
+                    <div class="trending-info">
+                        <div class="trending-title">#RedTeam</div>
+                        <div class="trending-meta">5.8K posts</div>
+                    </div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-rank">5</div>
+                    <div class="trending-info">
+                        <div class="trending-title">#OSINT</div>
+                        <div class="trending-meta">4.1K posts</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+
+</body>
+</html>

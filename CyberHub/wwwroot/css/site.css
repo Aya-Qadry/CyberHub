@@ -514,7 +514,6 @@ body {
 
 #adding{
     background: transparent;
-    border: 3px solid white;
     color:white;
 }
 #adding:focus {
@@ -522,3 +521,123 @@ body {
     border: 3px solid white;
     color: white;
 }
+
+
+.post {
+    border: 1px solid #555;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.post-content p {
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: #e8e8e8;
+}
+.stat-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.comment {
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 3px solid #8b5cf6;
+}
+#adding {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #555;
+}
+
+.comment strong {
+    color: #8b5cf6;
+}
+
+/* Add these CSS styles to your site.css file */
+
+/* User Avatar Styles */
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 20px;
+    color: white;
+    overflow: hidden;
+    position: relative;
+}
+
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+/* Post Avatar Styles */
+.post-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: white;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+    .post-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+/* Comment Avatar Styles */
+.comment-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: white;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+    .comment-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+/* Ensure proper spacing for comments with avatars */
+.comment {
+    padding: 8px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+    .comment-content div:first-child {
+        margin-bottom: 4px;
+    }
+
+    .comment-content p {
+        margin: 0;
+    }

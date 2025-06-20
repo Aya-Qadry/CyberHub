@@ -23,6 +23,9 @@ namespace CyberHub.Models
         [Display(Name = "Last seen")]
         public DateTime? LastLogin { get; set; }
 
+        public string? ProfilePictureUrl { get; set; }
+
+
         // les relations
         public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();

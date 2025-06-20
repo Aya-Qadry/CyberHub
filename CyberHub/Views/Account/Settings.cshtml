@@ -1,0 +1,114 @@
+﻿
+@model CyberHub.ViewModels.SettingsViewModel
+@{
+    ViewData["Title"] = "Settings";
+    Layout = null;
+
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberHub - Community</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>@ViewData["Title"] - CyberHub</title>
+    @* <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" /> *@
+    <link rel="stylesheet" href="~/css/settings.css" asp-append-version="true" />
+  
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                @* <i class="fas fa-shield-alt"></i> *@
+                <img src="~/images/logo-CH.png" alt="CyberHub Logo" class="illustration-logo" />
+                <span>CyberHub</span>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a asp-controller="Home" asp-action="Main" class="nav-link active">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>My posts</span>
+                        </a>
+                    </li>
+                                     
+                    <li class="nav-item">
+                        <a asp-controller="Account" asp-action="Settings" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+            
+        <main class="main-feed">
+            @if (ViewBag.SuccessMessage != null)
+            {
+                <div class="alert alert-success">@ViewBag.SuccessMessage</div>
+            }
+
+            <h2>Account Settings</h2>
+
+            @* <div style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;"> *@
+            @* <div style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; max-width: 100%;"> *@
+            <div class="settings-container">
+
+                <form asp-action="Settings" method="post" enctype="multipart/form-data" class="settings-form">
+                    @Html.AntiForgeryToken()
+                    <div class="groups">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input asp-for="UserName" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input asp-for="Email" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input asp-for="NewPassword" type="password" class="form-control" />
+                        </div>
+                    </div>
+                    
+                    <div style="flex-shrink: 0; text-align: center;" id="pfp-group">
+                        <img src="@(string.IsNullOrEmpty(Model.ProfilePictureUrl) ? "/images/default.jpg" : Model.ProfilePictureUrl)"
+                             alt="Profile Picture" id="pfp" />
+                        <div class="form-group">
+                            <label>Profile Picture</label>
+                            <input asp-for="ProfilePicture" type="file" class="form-control" accept="image/*" />
+                        </div>
+                    </div>
+                    <button type="submit" class="post-btn">Save Changes</button>
+
+                    
+                </form>
+
+      
+
+            </div>
+        </main>
+
+   
+     </div>
+
+</body>
+</html>
