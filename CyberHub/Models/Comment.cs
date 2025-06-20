@@ -13,11 +13,7 @@ namespace CyberHub.Models
         [Display(Name = "Post date")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        [Display(Name = "Update date")]
-        public DateTime? UpdatedAt { get; set; }
 
-        [Display(Name = "Approved")]
-        public bool IsApproved { get; set; } = true;
 
         [Required]
         public string AuthorId { get; set; } = string.Empty;

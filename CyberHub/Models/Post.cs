@@ -49,5 +49,7 @@ namespace CyberHub.Models
         public virtual Category Category { get; set; } = null!;
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public virtual ICollection<PostTag> PostTags { get; set; } = new List<PostTag>();
+        public ICollection<PostLike> PostLikes { get; set; } = new List<PostLike>();
+
     }
 }

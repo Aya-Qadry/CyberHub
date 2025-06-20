@@ -13,6 +13,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <title>@ViewData["Title"] - CyberHub</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
 </head>
 <body>
     <div class="container">
@@ -90,49 +91,61 @@
             <div class="post-composer">
                 @using (Html.BeginForm("CreatePost", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
                 {
+                    @Html.ValidationSummary(true, "", new { @class = "validation-summary" })
                     @Html.AntiForgeryToken()
 
-                    @Html.TextAreaFor(m => m.NewPost.Content, new
+                    @* @Html.TextAreaFor(m => m.NewPost.Content, new
                         {
                             @class = "composer-input",
                             placeholder = "What's the latest threat intel? Share your insights...",
                             required = "required"
-                        })
+                        }) *@
 
-                    @Html.TextBoxFor(m => m.NewPost.Tags, new
+                    <textarea name="Content" class="composer-input" placeholder="What's the latest threat intel? Share your insights..." required="required"></textarea>
+
+
+                    @* @Html.TextBoxFor(m => m.NewPost.Tags, new
                         {
                             @class = "tags-input",
                             placeholder = "Tags (e.g., #cybersecurity #malware #threatintel)",
                             id = "tagsInput"
-                        })
+                        }) *@
+
+                    <input type="text" name="Tags" class="tags-input" placeholder="Tags (e.g., #cybersecurity #malware #threatintel)" id="tagsInput" />
 
                     <div class="tags-error" id="tagsError" style="display: none;">
                         Each tag must start with # and be separated by spaces
                     </div>
 
+                    <div id="imagePreviewContainer" style="display:none; position: relative; margin-top: 10px;">
+                      <img id="imagePreview" src="#" alt="Image Preview" style="max-width: 200px; max-height: 200px; border-radius: 6px;" />
+                      <button type="button" id="removeImageBtn" style="position: absolute; top: 0; right: 0; background: #ff4757; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer;">×</button>
+                    </div>
+
+
                     <div class="composer-actions">
                         <div class="composer-tools">
                             <label class="tool-btn" title="Add Image">
                                 <i class="fas fa-image"></i>
+
                                 <input type="file" name="Image" accept="image/*" class="image-input" style="display: none;" />
                             </label>
 
-                            @Html.DropDownListFor(m => m.NewPost.CategoryId, new SelectList(new[]
-                                     {
-                        new { Value = "1", Text = "Malware" },
-                        new { Value = "2", Text = "Vulnerabilities" },
-                        new { Value = "3", Text = "Best Practices" },
-                        new { Value = "4", Text = "Network Security" },
-                        new { Value = "5", Text = "Application Security" },
-                        new { Value = "6", Text = "Cloud Security" },
-                        new { Value = "7", Text = "Mobile Security" },
-                        new { Value = "8", Text = "CTFs & Challenges" },
-                        new { Value = "9", Text = "Learning Resources" },
-                        new { Value = "10", Text = "Ethical Hacking" },
-                        new { Value = "11", Text = "Careers & Certifications" }
-                        }, "Value", "Text"),
-                                     "Select a category...",
-                                     new { @class = "category-dropdown", required = "required" })
+                         <select name="CategoryId" class="category-dropdown" required="required">
+                            <option value="">Select a category...</option>
+                            <option value="1">Malware</option>
+                            <option value="2">Vulnerabilities</option>
+                            <option value="3">Best Practices</option>
+                            <option value="4">Network Security</option>
+                            <option value="5">Application Security</option>
+                            <option value="6">Cloud Security</option>
+                            <option value="7">Mobile Security</option>
+                            <option value="8">CTFs & Challenges</option>
+                            <option value="9">Learning Resources</option>
+                            <option value="10">Ethical Hacking</option>
+                            <option value="11">Careers & Certifications</option>
+                        </select>
+
                         </div>
 
                         <button type="submit" class="post-btn">Post</button>
@@ -141,11 +154,11 @@
             </div>
 
     <!-- Feed Tabs -->
-    <div class="feed-tabs">
+    @* <div class="feed-tabs">
         <a href="#" class="tab active">For You</a>
         <a href="#" class="tab">Following</a>
         <a href="#" class="tab">Trending</a>
-    </div>
+    </div> *@
 
     <!-- Posts -->
     @foreach (var post in Model.Posts)
@@ -163,14 +176,43 @@
                     </div>
                 </div>
             </div>
+
+            @* nv *@
+
+            <div class="post-category">
+                 @post.CategoryName
+            </div>
+
+            
             <div class="post-content">
                 <p>@Html.Raw(post.Content.Replace("\n", "<br/>"))</p>
             </div>
+
+            @if (!string.IsNullOrEmpty(post.ImageUrl))
+            {
+                <div class="post-image" style="margin: 15px 0;">
+                    <img src="@Url.Content(post.ImageUrl)" alt="Post image" style="max-width: 100%; border-radius: 12px;" />
+                </div>
+            }
+
+            
+            @if (post.Tags != null && post.Tags.Any())
+            {
+                <div class="post-tags">
+                    @foreach (var tag in post.Tags)
+                    {
+                        <a href="#" class="post-tag">#@tag</a>
+                    }
+                </div>
+            }
             <div class="post-stats">
-                <button class="stat-btn">
+                @* <button class="stat-btn like-btn" data-post-id="@post.Id"> *@
+                <button class="stat-btn like-btn @(post.IsLikedByCurrentUser ? "liked" : "")" data-post-id="@post.Id">
                     <i class="fas fa-thumbs-up"></i>
-                    <span>@post.LikesCount</span>
+                    <span class="like-count">@post.LikesCount</span>
                 </button>
+
+
                 <button class="stat-btn">
                     <i class="fas fa-comment"></i>
                     <span>@post.CommentsCount</span>
@@ -194,7 +236,12 @@
             <p>Be the first to share some cybersecurity insights!</p>
         </div>
     }
+
+
 </main>
+
+
+
 <!-- Right Sidebar -->
         <aside class="right-sidebar">
             <!-- Trending Threats -->
@@ -319,6 +366,86 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             showError(true);
             tagsInput.focus();
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.querySelector('input[name="Image"]');
+    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+    const imagePreview = document.getElementById('imagePreview');
+    const removeImageBtn = document.getElementById('removeImageBtn');
+
+    imageInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreviewContainer.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            imagePreviewContainer.style.display = 'none';
+            imagePreview.src = '#';
+        }
+    });
+
+    removeImageBtn.addEventListener('click', function() {
+        imageInput.value = ''; // Clear the input
+        imagePreview.src = '#';
+        imagePreviewContainer.style.display = 'none';
+    });
+});
+
+
+document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', async function () {
+        const postId = this.dataset.postId;
+        const likeCountSpan = this.querySelector('.like-count');
+        
+        // Disable button temporarily to prevent double-clicks
+        this.disabled = true;
+
+        try {
+            const formData = new URLSearchParams();
+            formData.append('postId', postId);
+
+            const response = await fetch('/Home/ToggleLike', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: formData.toString()
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                
+                likeCountSpan.textContent = data.likeCount;
+                
+                if (data.isLiked) {
+                    this.classList.add('liked');
+                } else {
+                    this.classList.remove('liked');
+                }
+                
+                this.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+                
+            } else if (response.status === 401) {
+                alert('You need to be logged in to like posts.');
+            } else {
+                console.error('Error toggling like:', response.statusText);
+                alert('Something went wrong. Please try again.');
+            }
+        } catch (error) {
+            console.error('Network error:', error);
+            alert('Network error. Please check your connection.');
+        } finally {
+            this.disabled = false;
         }
     });
 });

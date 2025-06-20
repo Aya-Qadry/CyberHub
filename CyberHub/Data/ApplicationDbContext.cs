@@ -16,6 +16,7 @@ namespace CyberHub.Data
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<PostTag> PostTags => Set<PostTag>();
+        public DbSet<PostLike> PostLikes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -54,6 +55,19 @@ namespace CyberHub.Data
                .WithMany(p => p.Comments)
                .HasForeignKey(c => c.PostId)
                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<PostLike>()
+                .HasOne(pl => pl.Post)
+                .WithMany(p => p.PostLikes)
+                .HasForeignKey(pl => pl.PostId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<PostLike>()
+                .HasOne(pl => pl.User)
+                .WithMany()  
+                .HasForeignKey(pl => pl.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
         }
     }
 }

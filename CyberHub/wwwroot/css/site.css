@@ -331,12 +331,15 @@ body {
     padding: 8px 12px;
     border-radius: 6px;
     transition: all 0.3s ease;
+    position: relative;
 }
 
     .stat-btn:hover {
         background: #555;
         color: #00d4ff;
     }
+
+
 
 /* Right Sidebar */
 .right-sidebar {
@@ -455,3 +458,55 @@ body {
     ::-webkit-scrollbar-thumb:hover {
         background: linear-gradient(45deg, #00b8e6, #7c3aed);
     }
+
+
+/* nv */
+
+.post-category {
+    color: #00d4ff;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.post-tags {
+    margin-bottom: 12px;
+}
+
+.post-tag {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 4px 10px;
+    background: #00d4ff;
+    color: #1a1a1a;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+    .post-tag:hover {
+        background: #008fcf;
+    }
+
+.post-image img {
+    display: block;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+
+.stat-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.like-btn.liked {
+    background: #555;
+    color: #00d4ff;
+}
+
+    .like-btn.liked i {
+        color: #00d4ff;
+    }
+

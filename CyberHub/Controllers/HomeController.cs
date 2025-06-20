@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using CyberHub.Data;
 using CyberHub.Models;
 using CyberHub.ViewModels;
@@ -6,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Security.Claims;
 
 namespace CyberHub.Controllers
 {
@@ -36,12 +37,15 @@ namespace CyberHub.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
+            var userId = currentUser.Id;
+
             var posts = await _context.Posts
                 .Include(p => p.Author)
                 .Include(p => p.Category)
                 .Include(p => p.Comments)
                 .Include(p => p.PostTags)
                     .ThenInclude(pt => pt.Tag)
+                 .Include(p => p.PostLikes)
                 .Where(p => p.IsPublished)
                 .OrderByDescending(p => p.CreatedAt)
                 .Take(20) // 20 most recent posts
@@ -54,33 +58,177 @@ namespace CyberHub.Controllers
                 CreatedAt = p.CreatedAt,
                 UserId = p.AuthorId,
                 UserDisplayName = p.Author.UserName ?? "Unknown User",
-                LikesCount = 0,  
-                CommentsCount = p.Comments.Count
+                LikesCount = p.PostLikes.Count,
+                CommentsCount = p.Comments.Count,
+                //nv
+                CategoryName = p.Category?.Name ?? "Other",
+                Tags = p.PostTags.Select(pt => pt.Tag.Name).ToList(),
+                ImageUrl = p.ImageUrl,
+
+                IsLikedByCurrentUser = p.PostLikes.Any(pl => pl.UserId == userId)
+
             }).ToList();
 
             var feedViewModel = new FeedViewModel
             {
                 CurrentUser = currentUser,
-                Posts = postViewModels
+                Posts = postViewModels,
+                NewPost = new CreatePostViewModel()
             };
 
             return View(feedViewModel);
         }
 
+        //[HttpPost]
+        //[Authorize]
+        //public async Task<IActionResult> ToggleLike(int postId)
+        //{
+        //    var user = await _userManager.GetUserAsync(User);
+        //    if (user == null) return Unauthorized();
+
+        //    var existingLike = await _context.PostLikes
+        //        .FirstOrDefaultAsync(pl => pl.PostId == postId && pl.UserId == user.Id);
+
+        //    if (existingLike != null)
+        //    {
+        //        _context.PostLikes.Remove(existingLike);
+        //    }
+        //    else
+        //    {
+        //        _context.PostLikes.Add(new PostLike { PostId = postId, UserId = user.Id });
+        //    }
+
+        //    await _context.SaveChangesAsync();
+
+        //    var likeCount = await _context.PostLikes.CountAsync(pl => pl.PostId == postId);
+        //    return Json(new { likeCount });
+        //}
+
+
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleLike(int postId)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                // Check if user already liked this post
+                var existingLike = await _context.PostLikes
+                    .FirstOrDefaultAsync(pl => pl.PostId == postId && pl.UserId == userId);
+
+                bool isLiked;
+
+                if (existingLike != null)
+                {
+                    // Unlike the post
+                    _context.PostLikes.Remove(existingLike);
+                    isLiked = false;
+                }
+                else
+                {
+                    // Like the post
+                    var like = new PostLike
+                    {
+                        PostId = postId,
+                        UserId = userId
+
+                    };
+                    _context.PostLikes.Add(like);
+                    isLiked = true;
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Get updated like count
+                var likeCount = await _context.PostLikes
+                    .CountAsync(pl => pl.PostId == postId);
+
+                return Json(new
+                {
+                    likeCount = likeCount,
+                    isLiked = isLiked
+                });
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+     
+        
+        
+        [HttpPost]
         [Authorize]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreatePost(CreatePostViewModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return RedirectToAction("Main");
-            }
+            _logger.LogInformation("CreatePost method called"); 
+            _logger.LogInformation($"ModelState.IsValid: {ModelState.IsValid}");
+            // testing
+            _logger.LogInformation($"Content received: '{model.Content}'");
+            _logger.LogInformation($"CategoryId received: {model.CategoryId}");
 
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
                 return RedirectToAction("Login", "Account");
+            }
+
+
+            if (!ModelState.IsValid)
+            {
+                // Add this to see what validation errors you have
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogError($"Validation error: {error.ErrorMessage}");
+                }
+                return RedirectToAction("Main");
+            }
+
+            
+
+            if (!ModelState.IsValid)
+            {
+                var posts = await _context.Posts
+                    .Include(p => p.Author)
+                    .Include(p => p.Category)
+                    .Include(p => p.Comments)
+                    .Include(p => p.PostTags)
+                        .ThenInclude(pt => pt.Tag)
+                    .Where(p => p.IsPublished)
+                    .OrderByDescending(p => p.CreatedAt)
+                    .Take(20)
+                    .ToListAsync();
+
+                var postViewModels = posts.Select(p => new PostViewModel
+                {
+                    Id = p.Id,
+                    Content = p.Content,
+                    CreatedAt = p.CreatedAt,
+                    UserId = p.AuthorId,
+                    UserDisplayName = p.Author.UserName ?? "Unknown User",
+                    LikesCount = 0,
+                    CommentsCount = p.Comments.Count
+                }).ToList();
+
+                var feedViewModel = new FeedViewModel
+                {
+                    CurrentUser = currentUser,
+                    Posts = postViewModels,
+                    NewPost = model 
+                };
+
+                return View("Main", feedViewModel);
+
+                //return RedirectToAction("Main");
             }
 
 
@@ -121,9 +269,15 @@ namespace CyberHub.Controllers
 
             if (!string.IsNullOrEmpty(model.Tags))
             {
-                var tagNames = model.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                //var tagNames = model.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                //    .Select(t => t.Trim())
+                //    .Where(t => !string.IsNullOrEmpty(t))
+                //    .ToList();
+
+                var tagNames = model.Tags.Split(' ', StringSplitOptions.RemoveEmptyEntries)
                     .Select(t => t.Trim())
-                    .Where(t => !string.IsNullOrEmpty(t))
+                    .Where(t => !string.IsNullOrEmpty(t) && t.StartsWith("#"))
+                    .Select(t => t.Substring(1)) // no # symbol
                     .ToList();
 
                 foreach (var tagName in tagNames)
@@ -145,7 +299,7 @@ namespace CyberHub.Controllers
                 }
                 await _context.SaveChangesAsync();
             }
-
+            _logger.LogInformation("Post created successfully");
             return RedirectToAction("Main");
         }
 
