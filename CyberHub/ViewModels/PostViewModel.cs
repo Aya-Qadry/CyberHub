@@ -20,6 +20,7 @@
         public List<string> Tags { get; set; }
         public string ImageUrl { get; set; }
 
+        public List<CommentViewModel> Comments { get; set; } = new();
 
 
     }

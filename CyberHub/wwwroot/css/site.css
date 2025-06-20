@@ -490,7 +490,7 @@ body {
 
 .post-image img {
     display: block;
-    max-height: 300px;
+/*    max-height: 300px;*/
     object-fit: cover;
     border-radius: 12px;
 }
@@ -510,3 +510,15 @@ body {
         color: #00d4ff;
     }
 
+
+
+#adding{
+    background: transparent;
+    border: 3px solid white;
+    color:white;
+}
+#adding:focus {
+    background: transparent;
+    border: 3px solid white;
+    color: white;
+}

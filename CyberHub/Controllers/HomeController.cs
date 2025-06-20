@@ -1,4 +1,4 @@
-using CyberHub.Data;
+﻿using CyberHub.Data;
 using CyberHub.Models;
 using CyberHub.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -42,10 +42,12 @@ namespace CyberHub.Controllers
             var posts = await _context.Posts
                 .Include(p => p.Author)
                 .Include(p => p.Category)
-                .Include(p => p.Comments)
+                //.Include(p => p.Comments)
                 .Include(p => p.PostTags)
                     .ThenInclude(pt => pt.Tag)
                  .Include(p => p.PostLikes)
+                 .Include(p => p.Comments)
+                       .ThenInclude(c => c.Author)
                 .Where(p => p.IsPublished)
                 .OrderByDescending(p => p.CreatedAt)
                 .Take(20) // 20 most recent posts
@@ -65,7 +67,17 @@ namespace CyberHub.Controllers
                 Tags = p.PostTags.Select(pt => pt.Tag.Name).ToList(),
                 ImageUrl = p.ImageUrl,
 
-                IsLikedByCurrentUser = p.PostLikes.Any(pl => pl.UserId == userId)
+                IsLikedByCurrentUser = p.PostLikes.Any(pl => pl.UserId == userId),
+                
+                Comments = p.Comments
+                    .OrderByDescending(c => c.CreatedAt)
+                    .Select(c => new CommentViewModel
+                    {
+                        Content = c.Content,
+                        AuthorName = c.Author.UserName ?? "User",
+                        CreatedAt = c.CreatedAt
+                    }).ToList()
+
 
             }).ToList();
 
@@ -162,9 +174,44 @@ namespace CyberHub.Controllers
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
-     
-        
-        
+
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddComment(int postId, string content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+                return BadRequest("Comment cannot be empty.");
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var comment = new Comment
+            {
+                Content = content,
+                PostId = postId,
+                AuthorId = userId!,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Comments.Add(comment);
+            await _context.SaveChangesAsync();
+
+            var user = await _userManager.FindByIdAsync(userId);
+            var viewModel = new CommentViewModel
+            {
+                Content = comment.Content,
+                AuthorName = user?.UserName ?? "User",
+                CreatedAt = comment.CreatedAt
+            };
+
+            return PartialView("_SingleComment", viewModel); // ⬅ only return the comment HTML
+        }
+
+
+
+
+
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]

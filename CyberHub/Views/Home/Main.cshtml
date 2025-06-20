@@ -213,18 +213,53 @@
                 </button>
 
 
-                <button class="stat-btn">
+                <button class="stat-btn comment-toggle-btn" data-post-id="@post.Id">
                     <i class="fas fa-comment"></i>
                     <span>@post.CommentsCount</span>
                 </button>
-                <button class="stat-btn">
+                @* <button class="stat-btn">
                     <i class="fas fa-share"></i>
                     <span>0</span>
                 </button>
                 <button class="stat-btn">
                     <i class="fas fa-bookmark"></i>
-                </button>
+                </button> *@
             </div>
+
+             <div class="comment-form-container" id="comment-form-@post.Id" style="display: none; margin-top: 10px;">
+              
+                @* <form method="post" asp-controller="Home" asp-action="AddComment">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="postId" value="@post.Id" />
+                    <textarea name="content" placeholder="Write a comment..." required style="width: 100%; padding: 10px; border-radius: 6px;" id="adding"></textarea>
+                    <button type="submit" style="margin-top: 5px;" class="post-btn">Submit</button>
+                </form> *@
+
+                <form method="post" class="comment-form" data-post-id="@post.Id" asp-controller="Home" asp-action="AddComment">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="postId" value="@post.Id" />
+                    <textarea name="content" placeholder="Write a comment..." required style="width: 100%; padding: 10px; border-radius: 6px;" , id="adding"></textarea>
+                    <button type="submit" style="margin-top: 5px;" class="post-btn">Submit</button>
+                </form>
+
+
+            </div>
+
+            @if (post.Comments.Any())
+{
+    <div class="comments-section" style="margin-top: 10px;">
+        @foreach (var comment in post.Comments)
+        {
+            <div class="comment" style="padding: 8px; border-bottom: 1px solid #333;">
+                <strong>@comment.AuthorName</strong> • 
+                <small>@comment.CreatedAt.ToString("MMM dd, HH:mm")</small>
+                <p>@comment.Content</p>
+            </div>
+        }
+    </div>
+}
+
+
         </article>
     }
 
@@ -449,6 +484,53 @@ document.querySelectorAll('.like-btn').forEach(btn => {
         }
     });
 });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.comment-toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const postId = btn.dataset.postId;
+                const formContainer = document.getElementById(`comment-form-${postId}`);
+                formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+            });
+        });
+    });
+
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.comment-form').forEach(form => {
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const postId = formData.get("postId");
+
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const html = await response.text();
+                    const container = document.querySelector(`#comment-form-${postId}`).closest('.post').querySelector('.comments-section');
+
+                    // If no comments-section exists yet, create one
+                    if (!container) {
+                        const newSection = document.createElement('div');
+                        newSection.className = 'comments-section';
+                        newSection.innerHTML = html;
+                        this.closest('.post').appendChild(newSection);
+                    } else {
+                        container.insertAdjacentHTML('afterbegin', html);
+                    }
+
+                    this.reset(); // Clear textarea
+                } else {
+                    alert("Failed to add comment");
+                }
+            });
+        });
+    });
 </script>
 
 </body>
