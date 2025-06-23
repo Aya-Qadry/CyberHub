@@ -92,12 +92,10 @@ namespace CyberHub.Controllers
                 passwordChanged = true;
             }
 
-            // Update other user properties
             user.UserName = model.UserName;
             user.Email = model.Email;
             user.PhoneNumber = model.PhoneNumber;
 
-            // Handle profile picture upload
             if (model.ProfilePicture != null && model.ProfilePicture.Length > 0)
             {
                 Console.WriteLine("File name: " + model.ProfilePicture.FileName);
@@ -106,7 +104,6 @@ namespace CyberHub.Controllers
                 var uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "uploads");
                 Directory.CreateDirectory(uploadsFolder);
 
-                // Delete old profile picture if it exists
                 if (!string.IsNullOrEmpty(user.ProfilePictureUrl) && user.ProfilePictureUrl != "/images/default.jpg")
                 {
                     var oldPath = Path.Combine(_hostEnvironment.WebRootPath, user.ProfilePictureUrl.TrimStart('/'));
@@ -126,7 +123,6 @@ namespace CyberHub.Controllers
                 Console.WriteLine("Assigned URL: " + user.ProfilePictureUrl);
             }
 
-            // Update user in database
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
             {
@@ -135,7 +131,6 @@ namespace CyberHub.Controllers
                 return View(model);
             }
 
-            // If password was changed, sign out and redirect to login
             if (passwordChanged)
             {
                 Console.WriteLine("Signing out user after password change");
@@ -145,7 +140,6 @@ namespace CyberHub.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            // If no password change, refresh sign-in and stay on settings page
             Console.WriteLine("No password change, refreshing sign-in");
             await _signInManager.RefreshSignInAsync(user);
 
@@ -165,12 +159,10 @@ namespace CyberHub.Controllers
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded) {
-                // Check if the "User" role exists, create it if not
                 if (!await _roleManager.RoleExistsAsync("User"))
                 {
                     await _roleManager.CreateAsync(new IdentityRole("User"));
                 }
-                // Assign the "User" role to the user
                 await _userManager.AddToRoleAsync(user, "User");
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
@@ -209,12 +201,15 @@ namespace CyberHub.Controllers
 
         }
 
-        //logout
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
+
+    
+
     }
 }

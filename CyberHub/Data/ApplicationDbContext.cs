@@ -22,7 +22,6 @@ namespace CyberHub.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                // Only used for migrations - replace with your connection string
                 optionsBuilder.UseSqlServer("Server=aya\\sqlexpress;Database=CyberHubDb;Trusted_Connection=true;MultipleActiveResultSets=true;TrustServerCertificate=true");
             }
         }
@@ -31,11 +30,9 @@ namespace CyberHub.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Composite key for PostTag
             modelBuilder.Entity<PostTag>()
                 .HasKey(pt => new { pt.PostId, pt.TagId });
 
-            // Seed categories
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Malware", Description = "Discussions about viruses, worms, ransomware..." },
                 new Category { Id = 2, Name = "Vulnerabilities", Description = "Reports and fixes of known vulnerabilities" },

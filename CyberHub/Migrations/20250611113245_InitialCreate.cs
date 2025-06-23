@@ -199,7 +199,7 @@ namespace CyberHub.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Subject = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Snippet = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    //Snippet = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsPublished = table.Column<bool>(type: "bit", nullable: false),

@@ -23,10 +23,10 @@ namespace CyberHub.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        //public IActionResult Index()
+        //{
+        //    return View();
+        //}
 
 
         public async Task<IActionResult> Main()
@@ -59,7 +59,7 @@ namespace CyberHub.Controllers
                 CreatedAt = p.CreatedAt,
                 UserId = p.AuthorId,
                 UserDisplayName = p.Author.UserName ?? "Unknown User",
-                UserProfileImageUrl = p.Author.ProfilePictureUrl, // Add this line
+                UserProfileImageUrl = p.Author.ProfilePictureUrl, 
                 LikesCount = p.PostLikes.Count,
                 CommentsCount = p.Comments.Count,
                 CategoryName = p.Category?.Name ?? "Other",
@@ -73,21 +73,233 @@ namespace CyberHub.Controllers
                     {
                         Content = c.Content,
                         AuthorName = c.Author.UserName ?? "User",
-                        AuthorProfileImageUrl = c.Author.ProfilePictureUrl, // Add this line
+                        AuthorProfileImageUrl = c.Author.ProfilePictureUrl,  
                         CreatedAt = c.CreatedAt
                     }).ToList()
             }).ToList();
+
+            var trendingTags = await _context.Tags
+                .Select(tag => new
+                {
+                    tag.Name,
+                    PostCount = tag.PostTags.Count()
+                })
+                .OrderByDescending(t => t.PostCount)
+                .Take(5)
+                .ToListAsync();
+
+                    var trendingTagVMs = trendingTags
+                        .Select((t, i) => new TrendingTagViewModel
+                        {
+                            Rank = i + 1,
+                            Name = t.Name,
+                            PostCount = t.PostCount
+                        }).ToList();
+
+            var categories = await _context.Categories
+                .OrderBy(c => c.Id)
+                .Select(c => new CategoryViewModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description
+                })
+                .ToListAsync();
+
 
             var feedViewModel = new FeedViewModel
             {
                 CurrentUser = currentUser,
                 Posts = postViewModels,
-                NewPost = new CreatePostViewModel()
+                NewPost = new CreatePostViewModel(),
+                TrendingTags = trendingTagVMs,
+                Categories = categories 
             };
 
             return View(feedViewModel);
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> Tag(string name)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return RedirectToAction("Main");
+            }
+
+            var userId = currentUser.Id;
+
+            var posts = await _context.Posts
+                .Include(p => p.Author)
+                .Include(p => p.Category)
+                .Include(p => p.PostTags)
+                    .ThenInclude(pt => pt.Tag)
+                .Include(p => p.PostLikes)
+                .Include(p => p.Comments)
+                    .ThenInclude(c => c.Author)
+                .Where(p => p.IsPublished && p.PostTags.Any(pt => pt.Tag.Name == name))
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+
+            var postViewModels = posts.Select(p => new PostViewModel
+            {
+                Id = p.Id,
+                Content = p.Content,
+                CreatedAt = p.CreatedAt,
+                UserId = p.AuthorId,
+                UserDisplayName = p.Author.UserName ?? "Unknown User",
+                UserProfileImageUrl = p.Author.ProfilePictureUrl,
+                LikesCount = p.PostLikes.Count,
+                CommentsCount = p.Comments.Count,
+                CategoryName = p.Category?.Name ?? "Other",
+                Tags = p.PostTags.Select(pt => pt.Tag.Name).ToList(),
+                ImageUrl = p.ImageUrl,
+                IsLikedByCurrentUser = p.PostLikes.Any(pl => pl.UserId == userId),
+
+                Comments = p.Comments
+                    .OrderByDescending(c => c.CreatedAt)
+                    .Select(c => new CommentViewModel
+                    {
+                        Content = c.Content,
+                        AuthorName = c.Author.UserName ?? "User",
+                        AuthorProfileImageUrl = c.Author.ProfilePictureUrl,
+                        CreatedAt = c.CreatedAt
+                    }).ToList()
+            }).ToList();
+
+            var trendingTags = await _context.Tags
+                .Select(tag => new
+                {
+                    tag.Name,
+                    PostCount = tag.PostTags.Count()
+                })
+                .OrderByDescending(t => t.PostCount)
+                .Take(5)
+                .ToListAsync();
+
+            var trendingTagVMs = trendingTags
+                .Select((t, i) => new TrendingTagViewModel
+                {
+                    Rank = i + 1,
+                    Name = t.Name,
+                    PostCount = t.PostCount
+                }).ToList();
+            var categories = await _context.Categories
+                .OrderBy(c => c.Id)
+                .Select(c => new CategoryViewModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description
+                })
+                .ToListAsync();
+
+            var feedViewModel = new FeedViewModel
+            {
+                CurrentUser = currentUser,
+                Posts = postViewModels,
+                NewPost = new CreatePostViewModel(),
+                TrendingTags = trendingTagVMs,
+                Categories = categories  
+
+            };
+
+            return View("Main", feedViewModel); 
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Category(int id)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+
+
+            var userId = currentUser.Id;
+
+            var posts = await _context.Posts
+                .Include(p => p.Author)
+                .Include(p => p.Category)
+                .Include(p => p.PostTags).ThenInclude(pt => pt.Tag)
+                .Include(p => p.PostLikes)
+                .Include(p => p.Comments).ThenInclude(c => c.Author)
+                .Where(p => p.IsPublished && p.CategoryId == id)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+
+            var postViewModels = posts.Select(p => new PostViewModel
+            {
+                Id = p.Id,
+                Content = p.Content,
+                CreatedAt = p.CreatedAt,
+                UserId = p.AuthorId,
+                UserDisplayName = p.Author.UserName ?? "Unknown User",
+                UserProfileImageUrl = p.Author.ProfilePictureUrl,
+                LikesCount = p.PostLikes.Count,
+                CommentsCount = p.Comments.Count,
+                CategoryName = p.Category?.Name ?? "Other",
+                Tags = p.PostTags.Select(pt => pt.Tag.Name).ToList(),
+                ImageUrl = p.ImageUrl,
+                IsLikedByCurrentUser = p.PostLikes.Any(pl => pl.UserId == userId),
+                Comments = p.Comments.Select(c => new CommentViewModel
+                {
+                    Content = c.Content,
+                    AuthorName = c.Author.UserName ?? "User",
+                    AuthorProfileImageUrl = c.Author.ProfilePictureUrl,
+                    CreatedAt = c.CreatedAt
+                }).ToList()
+            }).ToList();
+
+            var trendingTags = await _context.Tags
+                .Select(tag => new
+                {
+                    tag.Name,
+                    PostCount = tag.PostTags.Count()
+                })
+                .OrderByDescending(t => t.PostCount)
+                .Take(5)
+                .ToListAsync();
+
+            var trendingTagVMs = trendingTags
+                .Select((t, i) => new TrendingTagViewModel
+                {
+                    Rank = i + 1,
+                    Name = t.Name,
+                    PostCount = t.PostCount
+                }).ToList();
+
+            var categories = await _context.Categories
+                .OrderBy(c => c.Id)
+                .Select(c => new CategoryViewModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description
+                })
+                .ToListAsync();
+
+            var feedViewModel = new FeedViewModel
+            {
+                CurrentUser = currentUser,
+                Posts = postViewModels,
+                NewPost = new CreatePostViewModel(),
+                TrendingTags = trendingTagVMs,
+                Categories = categories
+            };
+
+            return View("Main", feedViewModel);  
+        }
 
 
         //[HttpPost]
@@ -130,7 +342,6 @@ namespace CyberHub.Controllers
             {
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                // Check if user already liked this post
                 var existingLike = await _context.PostLikes
                     .FirstOrDefaultAsync(pl => pl.PostId == postId && pl.UserId == userId);
 
@@ -138,13 +349,11 @@ namespace CyberHub.Controllers
 
                 if (existingLike != null)
                 {
-                    // Unlike the post
                     _context.PostLikes.Remove(existingLike);
                     isLiked = false;
                 }
                 else
                 {
-                    // Like the post
                     var like = new PostLike
                     {
                         PostId = postId,
@@ -157,7 +366,6 @@ namespace CyberHub.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Get updated like count
                 var likeCount = await _context.PostLikes
                     .CountAsync(pl => pl.PostId == postId);
 
@@ -169,7 +377,6 @@ namespace CyberHub.Controllers
             }
             catch (Exception ex)
             {
-                // Log the error
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
@@ -204,7 +411,7 @@ namespace CyberHub.Controllers
                 CreatedAt = comment.CreatedAt
             };
 
-            return PartialView("_SingleComment", viewModel); // ⬅ only return the comment HTML
+            return PartialView("_SingleComment", viewModel);  
         }
 
 
@@ -218,7 +425,6 @@ namespace CyberHub.Controllers
         {
             _logger.LogInformation("CreatePost method called"); 
             _logger.LogInformation($"ModelState.IsValid: {ModelState.IsValid}");
-            // testing
             _logger.LogInformation($"Content received: '{model.Content}'");
             _logger.LogInformation($"CategoryId received: {model.CategoryId}");
 
@@ -231,7 +437,6 @@ namespace CyberHub.Controllers
 
             if (!ModelState.IsValid)
             {
-                // Add this to see what validation errors you have
                 foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                 {
                     _logger.LogError($"Validation error: {error.ErrorMessage}");
@@ -274,7 +479,6 @@ namespace CyberHub.Controllers
 
                 return View("Main", feedViewModel);
 
-                //return RedirectToAction("Main");
             }
 
 
@@ -302,7 +506,6 @@ namespace CyberHub.Controllers
             {
                 Subject = model.Content.Length > 50 ? model.Content.Substring(0, 50) + "..." : model.Content,
                 Content = model.Content,
-                Snippet = model.Content.Length > 300 ? model.Content.Substring(0, 300) + "..." : model.Content,
                 AuthorId = currentUser.Id,
                 CategoryId = model.CategoryId,
                 CreatedAt = DateTime.UtcNow,
@@ -367,23 +570,19 @@ namespace CyberHub.Controllers
         {
             try
             {
-                // Debug: Check if user is authenticated
                 if (!User.Identity.IsAuthenticated)
                 {
                     return RedirectToAction("Login", "Account");
                 }
 
-                // Get user ID from claims
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var userName = User.Identity.Name;
 
-                // Debug: Log user info
                 System.Diagnostics.Debug.WriteLine($"User ID: {userId}");
                 System.Diagnostics.Debug.WriteLine($"User Name: {userName}");
 
                 if (string.IsNullOrEmpty(userId))
                 {
-                    // Fallback to username if userId is null
                     if (!string.IsNullOrEmpty(userName))
                     {
                         var userByName = await _context.Users
@@ -397,7 +596,6 @@ namespace CyberHub.Controllers
                     }
                 }
 
-                // Get user
                 var user = await _context.Users
                     .FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -409,7 +607,6 @@ namespace CyberHub.Controllers
 
                 System.Diagnostics.Debug.WriteLine($"Found user: {user.UserName}");
 
-                // Get posts with all necessary includes
                 var posts = await _context.Posts
                     .Where(p => p.AuthorId == userId)
                     .Include(p => p.Author)
@@ -433,17 +630,57 @@ namespace CyberHub.Controllers
             }
             catch (Exception ex)
             {
-                // Debug: Log the full exception
                 System.Diagnostics.Debug.WriteLine($"Error in MyPosts: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
 
-                // You can also add logging here if you have a logger configured
-                // _logger.LogError(ex, "Error loading MyPosts page");
-
-                // For debugging purposes, return error details
-                // Remove this in production and use a proper error page
+          
                 return View("Error", new ErrorViewModel { RequestId = ex.Message });
             }
+        }
+
+
+        public async Task<IActionResult> Index()
+        {
+            var posts = await _context.Posts
+                .Include(p => p.Author)
+                .Include(p => p.Category)
+                .Include(p => p.PostTags).ThenInclude(pt => pt.Tag)
+                .Include(p => p.PostLikes)
+                .Include(p => p.Comments).ThenInclude(c => c.Author)
+                .Where(p => p.IsPublished)
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(20)
+                .ToListAsync();
+
+            var postViewModels = posts.Select(p => new PostViewModel
+            {
+                Id = p.Id,
+                Content = p.Content,
+                CreatedAt = p.CreatedAt,
+                UserId = p.AuthorId,
+                UserDisplayName = p.Author.UserName ?? "Unknown User",
+                UserProfileImageUrl = p.Author.ProfilePictureUrl,
+                LikesCount = p.PostLikes.Count,
+                CommentsCount = p.Comments.Count,
+                CategoryName = p.Category?.Name ?? "Other",
+                Tags = p.PostTags.Select(pt => pt.Tag.Name).ToList(),
+                ImageUrl = p.ImageUrl,
+                IsLikedByCurrentUser = false, // 
+                Comments = p.Comments.OrderByDescending(c => c.CreatedAt).Select(c => new CommentViewModel
+                {
+                    Content = c.Content,
+                    AuthorName = c.Author.UserName ?? "User",
+                    AuthorProfileImageUrl = c.Author.ProfilePictureUrl,
+                    CreatedAt = c.CreatedAt
+                }).ToList()
+            }).ToList();
+
+            var model = new HomeIndexViewModel
+            {
+                Posts = postViewModels
+            };
+
+            return View(model);
         }
 
 

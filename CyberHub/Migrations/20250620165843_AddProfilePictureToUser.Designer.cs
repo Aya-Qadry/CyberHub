@@ -186,9 +186,7 @@ namespace CyberHub.Migrations
                     b.Property<bool>("IsPublished")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Snippet")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                   
 
                     b.Property<string>("Subject")
                         .IsRequired()

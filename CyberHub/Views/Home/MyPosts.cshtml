@@ -19,7 +19,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Left Sidebar -->
         <aside class="sidebar">
             <div class="logo">
                 @* <i class="fas fa-shield-alt"></i> *@
@@ -29,7 +28,7 @@
             <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
-                        <a asp-controller="Home" asp-action="Main" class="nav-link active">
+                        <a asp-controller="Home" asp-action="Main" class="nav-link ">
                             <i class="fas fa-home"></i>
                             <span>Home</span>
                         </a>
@@ -46,6 +45,15 @@
                             <i class="fas fa-cog"></i>
                             <span>Settings</span>
                         </a>
+                    </li>
+                    <li class="nav-item">
+                        <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                            <button type="submit" class="nav-link" style="background:none; border:none; cursor:pointer;">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </button>
+                        </form>
+
                     </li>
                 </ul>
             </nav>
@@ -100,7 +108,6 @@
             </div>
         </div>
         
-        <!-- Rest of the post content stays the same -->
         <div class="post-category">
              @post.Category.Name
         </div>
@@ -126,7 +133,6 @@
             </div>
         }
         
-        <!-- Rest of post stats and form stays the same -->
         <div class="post-stats">
             @* <button class="stat-btn like-btn @(post.IsLikedByCurrentUser ? "liked" : "")" data-post-id="@post.Id">
                 <i class="fas fa-thumbs-up"></i>
@@ -193,91 +199,8 @@
 
 
 
-<!-- Right Sidebar -->
-        <aside class="right-sidebar">
-            <!-- Trending Threats -->
-            <div class="widget">
-                <div class="widget-header">
-                    <i class="fas fa-fire"></i>
-                    <span>Trending Threats</span>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">1</div>
-                    <div class="trending-info">
-                        <div class="trending-title">Log4Shell Variants</div>
-                        <div class="trending-meta">2.3K discussions</div>
-                    </div>
-                    <span class="threat-level threat-high">HIGH</span>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">2</div>
-                    <div class="trending-info">
-                        <div class="trending-title">APT29 Campaign</div>
-                        <div class="trending-meta">1.8K discussions</div>
-                    </div>
-                    <span class="threat-level threat-medium">MED</span>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">3</div>
-                    <div class="trending-info">
-                        <div class="trending-title">Cloud Misconfigurations</div>
-                        <div class="trending-meta">1.2K discussions</div>
-                    </div>
-                    <span class="threat-level threat-medium">MED</span>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">4</div>
-                    <div class="trending-info">
-                        <div class="trending-title">Supply Chain Attacks</div>
-                        <div class="trending-meta">956 discussions</div>
-                    </div>
-                    <span class="threat-level threat-low">LOW</span>
-                </div>
-            </div>
-
-            <!-- Trending Topics -->
-            <div class="widget">
-                <div class="widget-header">
-                    <i class="fas fa-hashtag"></i>
-                    <span>Trending Topics</span>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">1</div>
-                    <div class="trending-info">
-                        <div class="trending-title">#ZeroTrust</div>
-                        <div class="trending-meta">12.5K posts</div>
-                    </div>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">2</div>
-                    <div class="trending-info">
-                        <div class="trending-title">#ThreatHunting</div>
-                        <div class="trending-meta">8.9K posts</div>
-                    </div>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">3</div>
-                    <div class="trending-info">
-                        <div class="trending-title">#IncidentResponse</div>
-                        <div class="trending-meta">7.2K posts</div>
-                    </div>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">4</div>
-                    <div class="trending-info">
-                        <div class="trending-title">#RedTeam</div>
-                        <div class="trending-meta">5.8K posts</div>
-                    </div>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">5</div>
-                    <div class="trending-info">
-                        <div class="trending-title">#OSINT</div>
-                        <div class="trending-meta">4.1K posts</div>
-                    </div>
-                </div>
-            </div>
-        </aside>
+    
+    
     </div>
 
 

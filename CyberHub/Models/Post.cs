@@ -16,9 +16,9 @@ namespace CyberHub.Models
         [Display(Name = "Content")]
         public string Content { get; set; } = string.Empty;
 
-        [Display(Name = "Snippet")]
-        [StringLength(300)]
-        public string? Snippet { get; set; }
+        //[Display(Name = "Snippet")]
+        //[StringLength(300)]
+        //public string? Snippet { get; set; }
 
         [Display(Name = "Post date")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

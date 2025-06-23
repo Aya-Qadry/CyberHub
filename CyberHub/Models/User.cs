@@ -7,8 +7,7 @@ namespace CyberHub.Models
     public class User : IdentityUser
     {
 
-        //  the value can be null, and the compiler will warn
-        //  if you forget to check for null.
+     
         //[Display(Name = "Display Name")]
         //[StringLength(100)]
         //public string? DisplayName { get; set; }

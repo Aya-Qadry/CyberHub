@@ -1,5 +1,4 @@
-﻿/* Login Page Styles */
-.login-container {
+﻿.login-container {
     min-height: 100vh;
     background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
     display: flex;
@@ -24,7 +23,6 @@ body {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
 }
 
-/* Left Section - Form */
 .login-form-section {
     padding: 60px 50px;
     display: flex;
@@ -82,7 +80,6 @@ body {
         text-decoration: underline;
     }
 
-/* Social Buttons */
 .social-buttons {
     display: flex;
     flex-direction: column;
@@ -127,7 +124,6 @@ body {
     background: #374151;
 }
 
-/* Divider */
 .divider {
     display: flex;
     align-items: center;
@@ -145,7 +141,6 @@ body {
         margin: 0 16px;
     }
 
-/* Form Styles */
 .login-form {
     display: flex;
     flex-direction: column;
@@ -481,7 +476,6 @@ body {
     }
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .login-content {
         grid-template-columns: 1fr;
@@ -508,7 +502,6 @@ body {
 }
 
 .illustration-section {
-/*    background: #111827;*/
     display: flex;
     align-items: center;
     justify-content: center;

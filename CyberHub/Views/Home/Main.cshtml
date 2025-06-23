@@ -27,7 +27,7 @@
             <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
-                        <a asp-controller="Home" asp-action="Main" class="nav-link active">
+                        <a asp-controller="Home" asp-action="Main" class="nav-link">
                             <i class="fas fa-home"></i>
                             <span>Home</span>
                         </a>
@@ -46,6 +46,16 @@
                         <span>Settings</span>
                     </a>
                     </li>
+                    <li class="nav-item">
+                        <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                            <button type="submit" class="nav-link" style="background:none; border:none; cursor:pointer;">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </button>
+                        </form>
+
+                    </li>
+
                 </ul>
             </nav>
         </aside>
@@ -56,7 +66,6 @@
     ViewData["Title"] = "CyberHub - Main Feed";
 }
 
-<!-- Main Feed -->
 <main class="main-feed">
     @* <div class="user-header">
         <div class="user-avatar">@(Model.CurrentUser.UserName?.Substring(0, 2).ToUpper())</div>
@@ -150,12 +159,7 @@
                 }
             </div>
 
-    <!-- Feed Tabs -->
-    @* <div class="feed-tabs">
-        <a href="#" class="tab active">For You</a>
-        <a href="#" class="tab">Following</a>
-        <a href="#" class="tab">Trending</a>
-    </div> *@
+  
 
     <!-- Posts -->
     @foreach (var post in Model.Posts)
@@ -183,7 +187,6 @@
             </div>
         </div>
         
-        <!-- Rest of the post content stays the same -->
         <div class="post-category">
              @post.CategoryName
         </div>
@@ -203,13 +206,13 @@
         {
             <div class="post-tags">
                 @foreach (var tag in post.Tags)
-                {
-                    <a href="#" class="post-tag">#@tag</a>
-                }
+                    {
+                        <a asp-controller="Home" asp-action="Tag" asp-route-name="@tag" class="post-tag"> #@tag </a>
+                    }
+
             </div>
         }
         
-        <!-- Rest of post stats and form stays the same -->
         <div class="post-stats">
             <button class="stat-btn like-btn @(post.IsLikedByCurrentUser ? "liked" : "")" data-post-id="@post.Id">
                 <i class="fas fa-thumbs-up"></i>
@@ -276,92 +279,48 @@
 
 
 
-<!-- Right Sidebar -->
+<!-- Right sidebar -->
         <aside class="right-sidebar">
-            <!-- Trending Threats -->
-            <div class="widget">
-                <div class="widget-header">
-                    <i class="fas fa-fire"></i>
-                    <span>Trending Threats</span>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">1</div>
-                    <div class="trending-info">
-                        <div class="trending-title">Log4Shell Variants</div>
-                        <div class="trending-meta">2.3K discussions</div>
-                    </div>
-                    <span class="threat-level threat-high">HIGH</span>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">2</div>
-                    <div class="trending-info">
-                        <div class="trending-title">APT29 Campaign</div>
-                        <div class="trending-meta">1.8K discussions</div>
-                    </div>
-                    <span class="threat-level threat-medium">MED</span>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">3</div>
-                    <div class="trending-info">
-                        <div class="trending-title">Cloud Misconfigurations</div>
-                        <div class="trending-meta">1.2K discussions</div>
-                    </div>
-                    <span class="threat-level threat-medium">MED</span>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">4</div>
-                    <div class="trending-info">
-                        <div class="trending-title">Supply Chain Attacks</div>
-                        <div class="trending-meta">956 discussions</div>
-                    </div>
-                    <span class="threat-level threat-low">LOW</span>
-                </div>
-            </div>
 
-            <!-- Trending Topics -->
             <div class="widget">
                 <div class="widget-header">
                     <i class="fas fa-hashtag"></i>
-                    <span>Trending Topics</span>
+                    <span>Trending Tags</span>
                 </div>
-                <div class="trending-item">
-                    <div class="trending-rank">1</div>
-                    <div class="trending-info">
-                        <div class="trending-title">#ZeroTrust</div>
-                        <div class="trending-meta">12.5K posts</div>
+
+                @foreach (var tag in Model.TrendingTags)
+                {
+                    <div class="trending-item">
+                        <div class="trending-rank">@tag.Rank</div>
+                        <div class="trending-info">
+                            @* <div class="trending-title">#@tag.Name</div> *@
+                            <a asp-controller="Home" asp-action="Tag" asp-route-name="@tag.Name" class="trending-title">#@tag.Name</a>
+
+                            <div class="trending-meta">@tag.PostCount posts</div>
+                        </div>
                     </div>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">2</div>
-                    <div class="trending-info">
-                        <div class="trending-title">#ThreatHunting</div>
-                        <div class="trending-meta">8.9K posts</div>
-                    </div>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">3</div>
-                    <div class="trending-info">
-                        <div class="trending-title">#IncidentResponse</div>
-                        <div class="trending-meta">7.2K posts</div>
-                    </div>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">4</div>
-                    <div class="trending-info">
-                        <div class="trending-title">#RedTeam</div>
-                        <div class="trending-meta">5.8K posts</div>
-                    </div>
-                </div>
-                <div class="trending-item">
-                    <div class="trending-rank">5</div>
-                    <div class="trending-info">
-                        <div class="trending-title">#OSINT</div>
-                        <div class="trending-meta">4.1K posts</div>
-                    </div>
-                </div>
+                }
             </div>
+
+            <div class="widget">
+                <div class="widget-header">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Browse by Category</span>
+                </div>
+
+                @foreach (var category in Model.Categories)
+                {
+                    <a asp-controller="Home" asp-action="Category" asp-route-id="@category.Id" class="trending-item">
+                        <div class="trending-info">
+                            <div class="trending-title">@category.Name</div>
+                            <div class="trending-meta">@category.Description</div>
+                        </div>
+                    </a>
+                }
+            </div>
+  
         </aside>
-    </div>
+        </div>
 
 
     <script>
@@ -371,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const form = tagsInput.closest('form');
     
     function validateTags(value) {
-        if (!value.trim()) return true; // Empty is valid
+        if (!value.trim()) return true;  
         
         const tags = value.trim().split(/\s+/);
         return tags.every(tag => tag.startsWith('#') && tag.length > 1);
@@ -382,19 +341,16 @@ document.addEventListener('DOMContentLoaded', function() {
         tagsInput.style.borderColor = show ? '#ff4757' : '#555555';
     }
     
-    // Real-time validation on input
     tagsInput.addEventListener('input', function() {
         const isValid = validateTags(this.value);
         showError(!isValid);
     });
     
-    // Validation on blur
     tagsInput.addEventListener('blur', function() {
         const isValid = validateTags(this.value);
         showError(!isValid);
     });
     
-    // Prevent form submission if tags are invalid
     form.addEventListener('submit', function(e) {
         const isValid = validateTags(tagsInput.value);
         if (!isValid) {
@@ -426,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     removeImageBtn.addEventListener('click', function() {
-        imageInput.value = ''; // Clear the input
+        imageInput.value = '';  
         imagePreview.src = '#';
         imagePreviewContainer.style.display = 'none';
     });
@@ -438,7 +394,6 @@ document.querySelectorAll('.like-btn').forEach(btn => {
         const postId = this.dataset.postId;
         const likeCountSpan = this.querySelector('.like-count');
         
-        // Disable button temporarily to prevent double-clicks
         this.disabled = true;
 
         try {
@@ -514,7 +469,6 @@ document.querySelectorAll('.like-btn').forEach(btn => {
                     const html = await response.text();
                     const container = document.querySelector(`#comment-form-${postId}`).closest('.post').querySelector('.comments-section');
 
-                    // If no comments-section exists yet, create one
                     if (!container) {
                         const newSection = document.createElement('div');
                         newSection.className = 'comments-section';
@@ -524,12 +478,13 @@ document.querySelectorAll('.like-btn').forEach(btn => {
                         container.insertAdjacentHTML('afterbegin', html);
                     }
 
-                    this.reset(); // Clear textarea
+                    this.reset();  
                 } else {
                     alert("Failed to add comment");
                 }
             });
         });
+    });
     });
 </script>
 
